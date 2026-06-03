@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog - Infinity Promo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-container">
+      <a href="index.html" class="logo">
+        <img src="infinity.png" alt="Logo" class="logo-img">
+        Infinity Promo
+      </a>
+      <button class="menu-toggle" aria-label="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" x2="20" y1="12" y2="12"/>
+          <line x1="4" x2="20" y1="6" y2="6"/>
+          <line x1="4" x2="20" y1="18" y2="18"/>
+        </svg>
+      </button>
+      <ul class="nav-links">
+        <li><a href="index.html">Início</a></li>
+        <li><a href="sobre.html">Sobre</a></li>
+        <li><a href="blog.html" class="active">Blog</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="page-header">
+    <h1>Blog</h1>
+  </div>
+
+  <section class="section">
+    <div class="blog-grid">
+      <article class="blog-card">
+        <img src="https://picsum.photos/seed/blog1/400/200" alt="Dicas de Compras">
+        <div class="info">
+          <h3>10 Dicas para Economizar nas Compras Online</h3>
+          <p>Aprenda a identificar promoções reais e evitar armadilhas de preços inflados.</p>
+          <span class="date">28 Mai 2026</span>
+        </div>
+      </article>
+
+      <article class="blog-card">
+        <img src="https://picsum.photos/seed/blog2/400/200" alt="Melhores Eletrônicos">
+        <div class="info">
+          <h3>Os Melhores Eletrônicos com Desconto em 2026</h3>
+          <p>Lista atualizada dos gadgets que mais vale a pena comprar este ano.</p>
+          <span class="date">25 Mai 2026</span>
+        </div>
+      </article>
+
+      <article class="blog-card">
+        <img src="https://picsum.photos/seed/blog3/400/200" alt="Moda Sustentável">
+        <div class="info">
+          <h3>Moda Sustentável: Marcas com Preço Justo</h3>
+          <p>Conheça marcas que oferecem qualidade sem explorar o planeta.</p>
+          <span class="date">22 Mai 2026</span>
+        </div>
+      </article>
+
+      <article class="blog-card">
+        <img src="https://picsum.photos/seed/blog4/400/200" alt="Casa Inteligente">
+        <div class="info">
+          <h3>Casa Inteligente: Por Onde Começar</h3>
+          <p>Guia completo para automatizar sua casa com orçamento limitado.</p>
+          <span class="date">19 Mai 2026</span>
+        </div>
+      </article>
+
+      <article class="blog-card">
+        <img src="https://picsum.photos/seed/blog5/400/200" alt="Black Friday">
+        <div class="info">
+          <h3>Preparação para a Black Friday 2026</h3>
+          <p>Como se preparar para comprar tudo o que precisa com desconto real.</p>
+          <span class="date">15 Mai 2026</span>
+        </div>
+      </article>
+
+      <article class="blog-card">
+        <img src="https://picsum.photos/seed/blog6/400/200" alt="Avaliações">
+        <div class="info">
+          <h3>Como Verificar Avaliações de Produtos</h3>
+          <p>Dicas para não cair em reviews falsos e comprar com confiança.</p>
+          <span class="date">12 Mai 2026</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <div class="logo">
+          <img src="infinity.png" alt="Logo" class="logo-img">
+          Infinity Promo
+        </div>
+        <p>Encontre as melhores promoções</p>
+      </div>
+      <div class="footer-links">
+        <h4>Links</h4>
+        <ul>
+          <li><a href="sobre.html">Sobre</a></li>
+          <li><a href="#">Contato</a></li>
+          <li><a href="#">Política de Privacidade</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Infinity Promo. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelector('.menu-toggle').addEventListener('click', () => {
+      document.querySelector('.nav-links').classList.toggle('active');
+    });
+  </script>
+</body>
+</html>
