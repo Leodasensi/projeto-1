@@ -287,16 +287,37 @@ img {
   top: calc(100% + 8px);
   left: 0;
   width: 260px;
+  max-height: 280px;
+  overflow-y: auto;
   background: var(--bg-white);
   border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  padding: 16px;
+  padding: 16px 16px 0;
   z-index: 200;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
   transition: all 0.3s ease;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+}
+
+.filter-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.filter-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.filter-dropdown::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.filter-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #999;
 }
 
 .filter-dropdown.active {
@@ -369,6 +390,10 @@ img {
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 1rem;
+  margin-bottom: 16px;
+  position: sticky;
+  bottom: 0;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .filter-apply-btn:hover {
