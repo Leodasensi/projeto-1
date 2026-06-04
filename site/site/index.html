@@ -35,14 +35,88 @@
     <h1>Encontre as melhores promoções</h1>
     <p>Produtos com desconto real, atualizados todos os dias</p>
     <div class="search-box">
+      <div class="filter-container">
+        <button class="filter-toggle" id="filterToggle" aria-label="Filtros">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" x2="20" y1="12" y2="12"/>
+            <line x1="4" x2="20" y1="6" y2="6"/>
+            <line x1="4" x2="20" y1="18" y2="18"/>
+          </svg>
+        </button>
+        <div class="filter-dropdown" id="filterDropdown">
+          <div class="filter-group">
+            <h4>Categorias</h4>
+            <label class="filter-option">
+              <input type="radio" name="category" value="all" checked>
+              <span>Todos</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="category" value="Eletrônicos">
+              <span>Eletrônicos</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="category" value="Moda">
+              <span>Moda</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="category" value="Casa & Cozinha">
+              <span>Casa & Cozinha</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="category" value="Esportes">
+              <span>Esportes</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="category" value="Livros">
+              <span>Livros</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="category" value="Games">
+              <span>Games</span>
+            </label>
+          </div>
+          <div class="filter-divider"></div>
+          <div class="filter-group">
+            <h4>Desconto mínimo</h4>
+            <label class="filter-option">
+              <input type="radio" name="discount" value="0" checked>
+              <span>Qualquer desconto</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="discount" value="10">
+              <span>Acima de 10%</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="discount" value="20">
+              <span>Acima de 20%</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="discount" value="50">
+              <span>Acima de 50%</span>
+            </label>
+          </div>
+          <div class="filter-divider"></div>
+          <div class="filter-group">
+            <h4>Ordenar por</h4>
+            <label class="filter-option">
+              <input type="radio" name="sort" value="recent" checked>
+              <span>Mais recentes</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="sort" value="discount">
+              <span>Maior desconto</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="sort" value="price-asc">
+              <span>Menor preço</span>
+            </label>
+          </div>
+          <button class="filter-apply-btn" id="applyFilters">Aplicar filtros</button>
+        </div>
+      </div>
       <input type="text" class="search-input" id="homeSearch" placeholder="O que você está procurando?">
       <button class="search-btn" id="homeSearchBtn">Buscar</button>
     </div>
-  </section>
-
-  <section class="section">
-    <h2 class="section-title">Categorias</h2>
-    <div class="categories-grid" id="categoriesGrid"></div>
   </section>
 
   <section class="section">
@@ -73,7 +147,6 @@
     </div>
   </footer>
 
-  <script src="data/products.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

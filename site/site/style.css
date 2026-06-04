@@ -221,6 +221,7 @@ img {
   padding: 4rem 1.5rem;
   text-align: center;
   animation: fadeIn 0.8s ease;
+  position: relative;
 }
 
 .hero-logo {
@@ -251,6 +252,129 @@ img {
   max-width: 500px;
   margin: 0 auto;
   gap: 0.5rem;
+  align-items: stretch;
+}
+
+.filter-container {
+  position: relative;
+}
+
+.filter-toggle {
+  height: 100%;
+  padding: 1rem;
+  background: var(--bg-white);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.filter-toggle:hover {
+  border-color: var(--primary);
+}
+
+.filter-toggle svg {
+  width: 20px;
+  height: 20px;
+  color: var(--text-primary);
+}
+
+.filter-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 260px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 16px;
+  z-index: 200;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.filter-dropdown.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.filter-group h4 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.filter-option:hover {
+  background: var(--bg-light);
+}
+
+.filter-option input {
+  display: none;
+}
+
+.filter-option span {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.filter-option input:checked + span {
+  font-weight: 500;
+}
+
+.filter-option:has(input:checked) {
+  background: var(--bg-light);
+}
+
+.filter-option:has(input:checked) span {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.filter-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 1rem 0;
+}
+
+.filter-apply-btn {
+  width: 100%;
+  padding: 0.875rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.filter-apply-btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(26, 26, 26, 0.3);
 }
 
 .search-input {
@@ -262,6 +386,7 @@ img {
   font-family: 'Inter', sans-serif;
   outline: none;
   transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+  height: auto;
 }
 
 .search-input:focus {
@@ -313,22 +438,41 @@ img {
   animation: fadeInUp 0.5s ease both;
 }
 
+.categories-section {
+  background: #f5f5f5;
+  max-width: 100%;
+  padding: 3rem 1.5rem;
+}
+
+.categories-section .section-title {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .categories-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
   animation: fadeIn 0.5s ease 0.3s both;
 }
 
 .category-card {
   background: var(--bg-white);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.5rem 1rem;
-  text-align: center;
+  border-radius: 16px;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   animation: fadeInUp 0.5s ease both;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .category-card:nth-child(1) { animation-delay: 0.1s; }
@@ -349,9 +493,8 @@ img {
 }
 
 .category-card svg {
-  width: 32px;
-  height: 32px;
-  margin: 0 auto 0.75rem;
+  width: 40px;
+  height: 40px;
   color: var(--primary);
   transition: transform 0.3s ease;
 }
@@ -361,9 +504,9 @@ img {
 }
 
 .category-card span {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  color: var(--text-primary);
+  color: #4a4a4a;
 }
 
 /* Products Grid */

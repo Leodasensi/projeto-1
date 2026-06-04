@@ -1,11 +1,117 @@
 // Script da Home
+const products = [
+  {
+    id: 1,
+    name: "Smartphone Galaxy S24 Ultra",
+    description: "Câmera 208MP, tela AMOLED 6.8\", S Pen incluso",
+    category: "Eletrônicos",
+    originalPrice: 8499.00,
+    salePrice: 5999.00,
+    discount: 29,
+    imageId: "phone1",
+    link: "#"
+  },
+  {
+    id: 2,
+    name: "Notebook MacBook Air M3",
+    description: "Chip M3, 15\" Liquid Retina, 18h de bateria",
+    category: "Eletrônicos",
+    originalPrice: 12999.00,
+    salePrice: 9999.00,
+    discount: 23,
+    imageId: "laptop1",
+    link: "#"
+  },
+  {
+    id: 3,
+    name: "Tênis Nike Air Max 270",
+    description: "Conforto incrível para o dia a dia",
+    category: "Moda",
+    originalPrice: 899.90,
+    salePrice: 549.90,
+    discount: 39,
+    imageId: "shoes1",
+    link: "#"
+  },
+  {
+    id: 4,
+    name: "Smart TV Samsung 55\" 4K",
+    description: "Tela Crystal UHD, Smart TV com Alexa",
+    category: "Eletrônicos",
+    originalPrice: 3499.00,
+    salePrice: 2299.00,
+    discount: 34,
+    imageId: "tv1",
+    link: "#"
+  },
+  {
+    id: 5,
+    name: "Air Fryer Mondial 5.5L",
+    description: "Cozinha sem óleo, timer digital",
+    category: "Casa & Cozinha",
+    originalPrice: 499.90,
+    salePrice: 299.90,
+    discount: 40,
+    imageId: "airfryer1",
+    link: "#"
+  },
+  {
+    id: 6,
+    name: "PlayStation 5 Slim",
+    description: "1TB SSD, controle DualSense, 4K",
+    category: "Games",
+    originalPrice: 4499.00,
+    salePrice: 3499.00,
+    discount: 22,
+    imageId: "ps5",
+    link: "#"
+  }
+];
+
+console.log('Script iniciado');
 document.addEventListener('DOMContentLoaded', () => {
-  const categoriesGrid = document.getElementById('categoriesGrid');
+  console.log('DOM carregado');
   const productsGrid = document.getElementById('productsGrid');
   const homeSearch = document.getElementById('homeSearch');
   const homeSearchBtn = document.getElementById('homeSearchBtn');
   const menuToggle = document.querySelector('.menu-toggle');
   const navLinks = document.querySelector('.nav-links');
+
+  // Filtros dropdown
+  const filterToggle = document.getElementById('filterToggle');
+  const filterDropdown = document.getElementById('filterDropdown');
+  const applyFiltersBtn = document.getElementById('applyFilters');
+  let filterOpen = false;
+
+  // Estado dos filtros
+  let selectedCategory = 'all';
+  let selectedDiscount = '0';
+  let selectedSort = 'recent';
+
+  // Toggle dropdown
+  filterToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    filterOpen = !filterOpen;
+    filterDropdown.classList.toggle('active', filterOpen);
+  });
+
+  // Fechar ao clicar fora
+  document.addEventListener('click', (e) => {
+    if (filterOpen && !filterDropdown.contains(e.target) && e.target !== filterToggle) {
+      filterOpen = false;
+      filterDropdown.classList.remove('active');
+    }
+  });
+
+  // Aplicar filtros
+  applyFiltersBtn.addEventListener('click', () => {
+    selectedCategory = document.querySelector('input[name="category"]:checked').value;
+    selectedDiscount = document.querySelector('input[name="discount"]:checked').value;
+    selectedSort = document.querySelector('input[name="sort"]:checked').value;
+    filterOpen = false;
+    filterDropdown.classList.remove('active');
+    renderProducts();
+  });
 
   // Ícones SVG para categorias
   const categoryIcons = {
@@ -35,9 +141,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Renderizar produtos (6 destaques)
+  // Renderizar produtos com filtros
   function renderProducts() {
-    const featured = products.slice(0, 6);
+    let filtered = [...products];
+
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(p => p.category === selectedCategory);
+    }
+
+    if (selectedDiscount !== '0') {
+      filtered = filtered.filter(p => p.discount > parseInt(selectedDiscount));
+    }
+
+    switch (selectedSort) {
+      case 'discount':
+        filtered.sort((a, b) => b.discount - a.discount);
+        break;
+      case 'price-asc':
+        filtered.sort((a, b) => a.salePrice - b.salePrice);
+        break;
+      case 'recent':
+        filtered.sort((a, b) => b.id - a.id);
+        break;
+    }
+
+    const featured = filtered.slice(0, 6);
     productsGrid.innerHTML = featured.map(product => createProductCard(product)).join('');
   }
 
@@ -83,6 +211,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Inicializar
-  renderCategories();
   renderProducts();
 });
