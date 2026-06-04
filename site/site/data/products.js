@@ -1,135 +1,313 @@
 const products = [
   {
     id: 1,
+    slug: "galaxy-s24-ultra",
     name: "Smartphone Galaxy S24 Ultra",
     description: "Câmera 208MP, tela AMOLED 6.8\", S Pen incluso",
+    longDescription: "O Galaxy S24 Ultra redefine o conceito de smartphone premium. Equipado com o processador Snapdragon 8 Gen 3, 12GB de RAM e 256GB de armazenamento interno, oferece desempenho excepcional para qualquer tarefa. A câmera quádrupla de 200MP com zoom espacial de 100x captura fotos impressionantes em qualquer condição de luz. A tela Dynamic AMOLED 2X de 6.8 polegadas com taxa de atualização de 120Hz proporciona uma experiência visual fluida e vibrante. A S Pen integrada permite anotações, desenhos e controle preciso da interface.",
     category: "Eletrônicos",
     originalPrice: 8499.00,
     salePrice: 5999.00,
     discount: 29,
     imageId: "phone1",
-    link: "#"
+    specs: {
+      "Processador": "Snapdragon 8 Gen 3",
+      "RAM": "12GB",
+      "Armazenamento": "256GB",
+      "Tela": "6.8\" Dynamic AMOLED 2X 120Hz",
+      "Câmera Principal": "200MP + 50MP + 12MP + 10MP",
+      "Bateria": "5000mAh",
+      "Sistema": "Android 14 com One UI 6.1"
+    },
+    store: {
+      name: "Samsung Store",
+      freeShipping: true
+    },
+    link: "https://www.samsung.com.br"
   },
   {
     id: 2,
+    slug: "macbook-air-m3",
     name: "Notebook MacBook Air M3",
     description: "Chip M3, 15\" Liquid Retina, 18h de bateria",
+    longDescription: "O MacBook Air com chip M3 entrega performance profissional em um design incrivelmente fino e leve. O chip M3 com CPU de 8 núcleos e GPU de 10 cores proporciona velocidade até 60% maior que o modelo com M1. A tela Liquid Retina de 15.3 polegadas com 500 nits de brilho e suporte a um bilhão de cores torna qualquer conteúdo mais vívido. Com até 18 horas de bateria, você trabalha o dia todo sem se preocupar com tomadas. Construído em alumínio 100% reciclado, é silencioso por não ter ventoinha.",
     category: "Eletrônicos",
     originalPrice: 12999.00,
     salePrice: 9999.00,
     discount: 23,
     imageId: "laptop1",
-    link: "#"
+    specs: {
+      "Processador": "Apple M3 (8-core CPU)",
+      "GPU": "10-core",
+      "RAM": "8GB Unified Memory",
+      "Armazenamento": "256GB SSD",
+      "Tela": "15.3\" Liquid Retina",
+      "Bateria": "Até 18 horas",
+      "Peso": "1.51 kg"
+    },
+    store: {
+      name: "Apple Store",
+      freeShipping: true
+    },
+    link: "https://www.apple.com/br"
   },
   {
     id: 3,
+    slug: "nike-air-max-270",
     name: "Tênis Nike Air Max 270",
     description: "Conforto incrível para o dia a dia",
+    longDescription: "O Nike Air Max 270 traz o maior amortecimento Air já feito para um tênis lifestyle da Nike. Com cápsula de ar visível de 32mm no calcanhar, oferece conforto o dia inteiro sem perder estilo. O cabedal em mesh engineering proporciona respirabilidade, enquanto o solado de borracha garante aderência e durabilidade. Design moderno inspirado nos icônicos Air Max, perfeito para usar no dia a dia, em passeios ou na academia. Indicado para corrida leve e uso casual.",
     category: "Moda",
     originalPrice: 899.90,
     salePrice: 549.90,
     discount: 39,
     imageId: "shoes1",
-    link: "#"
+    specs: {
+      "Material": "Mesh engineering + sintético",
+      "Solado": "Borracha com amortecimento Air",
+      "Indicado para": "Casual e corrida leve",
+      "Tecnologia": "Air Max visível",
+      "Fechamento": "Cadarço",
+      "Gênero": "Unissex"
+    },
+    store: {
+      name: "Nike Brasil",
+      freeShipping: true
+    },
+    link: "https://www.nike.com.br"
   },
   {
     id: 4,
+    slug: "tv-samsung-55-4k",
     name: "Smart TV Samsung 55\" 4K",
     description: "Tela Crystal UHD, Smart TV com Alexa",
+    longDescription: "Smart TV Samsung de 55 polegadas com resolução 4K e tecnologia Crystal UHD que entrega imagens nítidas e cores vibrantes. O processador Crystal 4K otimiza qualquer conteúdo para perto da qualidade 4K real. Conta com o sistema operacional Tizen, que oferece acesso a Netflix, YouTube, Prime Video, Disney+ e milhares de outros aplicativos. Compatível com Alexa e Google Assistente para controle por voz. Modo game com baixa latência para uma experiência de jogos mais fluida. 3 entradas HDMI e 2 USB.",
     category: "Eletrônicos",
     originalPrice: 3499.00,
     salePrice: 2299.00,
     discount: 34,
     imageId: "tv1",
-    link: "#"
+    specs: {
+      "Tamanho": "55 polegadas",
+      "Resolução": "4K UHD (3840x2160)",
+      "Tecnologia": "Crystal UHD",
+      "Taxa de Atualização": "60Hz (Motion Rate 120)",
+      "HDR": "HDR 10+",
+      "Áudio": "20W RMS, Dolby Digital Plus",
+      "Entradas": "3 HDMI, 2 USB",
+      "Smart": "Tizen, Alexa integrada"
+    },
+    store: {
+      name: "Samsung Store",
+      freeShipping: true
+    },
+    link: "https://www.samsung.com.br"
   },
   {
     id: 5,
+    slug: "air-fryer-mondial-5l",
     name: "Air Fryer Mondial 5.5L",
     description: "Cozinha sem óleo, timer digital",
+    longDescription: "A Air Fryer Mondial de 5.5 litros cozinha com pouco ou nenhum óleo, entregando alimentos mais saudáveis e saborosos. Com potência de 1500W e temperatura ajustável de 80°C a 200°C, prepara desde batatas fritas crocantes até bolos e carnes grelhadas. O painel digital com timer de 60 minutos facilita o controle do preparo. Cesto removível com revestimento antiaderente que não gruda e é fácil de limpar. Design moderno em preto com acabamento fosco que combina com qualquer cozinha.",
     category: "Casa & Cozinha",
     originalPrice: 499.90,
     salePrice: 299.90,
     discount: 40,
     imageId: "airfryer1",
-    link: "#"
+    specs: {
+      "Capacidade": "5.5 litros",
+      "Potência": "1500W",
+      "Temperatura": "80°C a 200°C",
+      "Timer": "60 minutos",
+      "Voltagem": "110V ou 220V (verificar)",
+      "Material": "Plástico com cesto antiaderente",
+      "Cor": "Preto"
+    },
+    store: {
+      name: "Mondial Store",
+      freeShipping: false
+    },
+    link: "https://www.mondial.com.br"
   },
   {
     id: 6,
+    slug: "playstation-5-slim",
     name: "PlayStation 5 Slim",
     description: "1TB SSD, controle DualSense, 4K",
+    longDescription: "O PlayStation 5 Slim é a versão mais compacta e elegante do console de nova geração da Sony. Equipado com SSD customizado de 1TB que reduz drasticamente os tempos de carregamento, oferece suporte a jogos em 4K a 120fps e ray tracing para gráficos ultrarrealistas. O controle DualSense traz feedback háptico e gatilhos adaptáveis que mudam a forma como você sente os jogos. Compatível com milhares de títulos do PS4 e PS5, além de streaming em 4K dos principais serviços de entretenimento.",
     category: "Games",
     originalPrice: 4499.00,
     salePrice: 3499.00,
     discount: 22,
     imageId: "ps5",
-    link: "#"
+    specs: {
+      "CPU": "AMD Zen 2 8-core 3.5GHz",
+      "GPU": "AMD RDNA 2 10.28 TFLOPs",
+      "RAM": "16GB GDDR6",
+      "Armazenamento": "1TB SSD",
+      "Resolução": "Até 4K @ 120fps",
+      "Ray Tracing": "Sim",
+      "Controle": "DualSense incluso"
+    },
+    store: {
+      name: "PlayStation Store",
+      freeShipping: true
+    },
+    link: "https://store.playstation.com/pt-br"
   },
   {
     id: 7,
+    slug: "jaqueta-couro-feminina",
     name: "Jaqueta de Couro Feminina",
     description: "Estilo moderno, couro sintético premium",
+    longDescription: "Jaqueta feminina em couro sintético premium com caimento justo e estilo atemporal. Forro interno em tecido macio proporciona conforto em dias mais frios. Zíper frontal, bolsos laterais com zíper e detalhes em rebites que dão um toque rocker moderno. Disponível nos tamanhos P ao GG. Fácil de combinar com looks do dia a dia, desde um jeans básico até vestidos mais arrumados. Material durável e fácil de limpar — basta um pano úmido.",
     category: "Moda",
     originalPrice: 399.90,
     salePrice: 199.90,
     discount: 50,
     imageId: "jacket1",
-    link: "#"
+    specs: {
+      "Material": "Couro sintético PU",
+      "Forro": "Poliéster",
+      "Fechamento": "Zíper frontal",
+      "Bolsos": "2 laterais com zíper",
+      "Tamanhos": "P ao GG",
+      "Cor": "Preto"
+    },
+    store: {
+      name: "Zattini",
+      freeShipping: true
+    },
+    link: "https://www.zattini.com.br"
   },
   {
     id: 8,
+    slug: "aspirador-robo-xiaomi",
     name: "Aspirador Robô Xiaomi",
     description: "Mapeamento laser, controle por app",
+    longDescription: "O Aspirador Robô Xiaomi com mapeamento laser LDS de última geração escaneia o ambiente em 360° e planeja rotas inteligentes de limpeza. Com potência de sucção de 4000Pa, remove poeira, pelos e detritos de pisos frios e carpetes. Bateria de 5200mAh proporciona até 150 minutos de autonomia, suficiente para limpar até 250m². Controle total pelo app Mi Home: agende limpezas, defina zonas proibidas, monitore o mapeamento e integre com Alexa e Google Assistente. Reservatório de 450ml.",
     category: "Casa & Cozinha",
     originalPrice: 2499.00,
     salePrice: 1499.00,
     discount: 40,
     imageId: "robot1",
-    link: "#"
+    specs: {
+      "Sucção": "4000Pa",
+      "Bateria": "5200mAh (até 150 min)",
+      "Mapeamento": "Laser LDS 360°",
+      "Reservatório": "450ml",
+      "Conectividade": "Wi-Fi, app Mi Home",
+      "Compatível": "Alexa, Google Assistente",
+      "Peso": "3.6 kg"
+    },
+    store: {
+      name: "Xiaomi Oficial",
+      freeShipping: true
+    },
+    link: "https://www.mi.com/br"
   },
   {
     id: 9,
+    slug: "kit-halteres-30kg",
     name: "Kit Halteres Academia 30kg",
     description: "Aço fundido, emborrachado, 6 pares",
+    longDescription: "Kit completo de halteres para treino em casa ou academia. Composto por 6 pares (2kg, 3kg, 4kg, 5kg, 6kg e 9kg) totalizando 30kg, em aço fundido revestido de borracha de alta densidade. Os pesos não soltam com o uso e o revestimento protege o chão de marcas e arranhões. Os pegadores ergonômicos com textura antiderrapante garantem segurança e conforto durante os exercícios. Ideal para treinos de hipertrofia, funcional e condicionamento físico. Inclui suporte organizador.",
     category: "Esportes",
     originalPrice: 599.90,
     salePrice: 399.90,
     discount: 33,
     imageId: "weights1",
-    link: "#"
+    specs: {
+      "Material": "Aço fundido + borracha",
+      "Composição": "6 pares (2, 3, 4, 5, 6 e 9kg)",
+      "Peso Total": "30kg",
+      "Pegador": "Ergonômico antiderrapante",
+      "Acessórios": "Suporte organizador",
+      "Uso": "Doméstico e profissional"
+    },
+    store: {
+      name: "Decathlon",
+      freeShipping: false
+    },
+    link: "https://www.decathlon.com.br"
   },
   {
     id: 10,
+    slug: "nintendo-switch-oled",
     name: "Nintendo Switch OLED",
     description: "Tela 7\" OLED, dock com LAN",
+    longDescription: "O Nintendo Switch OLED mantém toda a versatilidade do Switch original com upgrades importantes. A tela OLED de 7 polegadas entrega cores mais vibrantes, contraste infinito e pretos profundos — ideal para jogar The Legend of Zelda, Mario e Splatoon com qualidade visual superior. O novo dock inclui porta Ethernet para conexões estáveis em modo TV, 64GB de armazenamento interno (dobro do modelo padrão) e um suporte traseiro mais largo e ajustável. Jogue em casa na TV, na mesa com os amigos ou em movimento no modo portátil.",
     category: "Games",
     originalPrice: 3299.00,
     salePrice: 2699.00,
     discount: 18,
     imageId: "switch",
-    link: "#"
+    specs: {
+      "Tela": "7\" OLED touchscreen",
+      "Resolução": "1080p (TV) / 720p (portátil)",
+      "Armazenamento": "64GB",
+      "Bateria": "4.5 a 9 horas (por jogo)",
+      "Conectividade": "Wi-Fi, Bluetooth, LAN no dock",
+      "Portas": "USB-C, HDMI, 3x USB no dock",
+      "Áudio": "Estéreo"
+    },
+    store: {
+      name: "Nintendo eShop",
+      freeShipping: true
+    },
+    link: "https://www.nintendo.com/pt-br"
   },
   {
     id: 11,
+    slug: "o-poder-do-habito",
     name: "O Poder do Hábito - Charles Duhigg",
     description: "Bestseller internacional de desenvolvimento",
+    longDescription: "O Poder do Hábito explora a ciência por trás de por que fazemos o que fazemos na vida, nos negócios e em sociedade. Charles Duhigg, repórter investigativo do New York Times, explica por que algumas pessoas e empresas conseguem se transformar enquanto outras fracassam. Através de histórias fascinantes — de um jogador de futebol que mudou a história dos jogos ao hábito de uma grande rede varejista de expandir pelo país — o autor revela a chave para entender e modificar nossos hábitos. Um clássico moderno do desenvolvimento pessoal que já vendeu mais de 3 milhões de cópias no mundo.",
     category: "Livros",
     originalPrice: 54.90,
     salePrice: 29.90,
     discount: 46,
     imageId: "book1",
-    link: "#"
+    specs: {
+      "Autor": "Charles Duhigg",
+      "Editora": "Objetiva",
+      "Idioma": "Português",
+      "Páginas": "408",
+      "Encadernação": "Brochura",
+      "ISBN": "9788539004119",
+      "Ano": "2012"
+    },
+    store: {
+      name: "Amazon Brasil",
+      freeShipping: true
+    },
+    link: "https://www.amazon.com.br"
   },
   {
     id: 12,
+    slug: "jbl-tune-770nc",
     name: "Fone JBL Tune 770NC",
     description: "Cancelamento de ruído, 44h de bateria",
+    longDescription: "O JBL Tune 770NC é um headphone over-ear com cancelamento ativo de ruído adaptativo que bloqueia o som ambiente para uma imersão total. Drivers de 40mm com o som Pure Bass Signature da JBL entregam graves profundos e agudos cristalinos. Bateria de até 44 horas (com ANC desligado) significa uma semana inteira de uso sem carregar. Conexão multipoint permite conectar dois dispositivos ao mesmo tempo — ouça música no celular e atenda chamadas no notebook sem trocar. Conectividade Bluetooth 5.3 estável e app JBL Headphones para equalização personalizada.",
     category: "Eletrônicos",
     originalPrice: 599.90,
     salePrice: 349.90,
     discount: 42,
     imageId: "headphone1",
-    link: "#"
+    specs: {
+      "Driver": "40mm",
+      "Conectividade": "Bluetooth 5.3",
+      "Bateria": "Até 44h (ANC off) / 30h (ANC on)",
+      "Cancelamento de Ruído": "ANC adaptativo",
+      "Multipoint": "2 dispositivos simultâneos",
+      "Carregamento": "USB-C, carga rápida (5min = 3h)",
+      "Peso": "232g"
+    },
+    store: {
+      name: "JBL Brasil",
+      freeShipping: true
+    },
+    link: "https://www.jbl.com.br"
   }
 ];
 
@@ -141,3 +319,21 @@ const categories = [
   { name: "Livros", icon: "book-open" },
   { name: "Games", icon: "gamepad-2" }
 ];
+
+function findProductBySlug(slug) {
+  return products.find(p => p.slug === slug);
+}
+
+function findProductById(id) {
+  return products.find(p => p.id === parseInt(id));
+}
+
+function getRelatedProducts(productId, category, limit = 3) {
+  return products
+    .filter(p => p.id !== productId && p.category === category)
+    .slice(0, limit);
+}
+
+function formatPrice(price) {
+  return "R$ " + price.toFixed(2).replace('.', ',');
+}

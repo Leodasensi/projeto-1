@@ -109,27 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Criar card do produto
-  function createProductCard(product) {
-    return `
-      <div class="product-card">
-        <div class="product-image">
-          <img src="https://picsum.photos/seed/${product.imageId}/400/300" alt="${product.name}">
-          <span class="discount-badge">-${product.discount}%</span>
-        </div>
-        <div class="product-info">
-          <span class="category-tag">${product.category}</span>
-          <h3 class="product-name">${product.name}</h3>
-          <p class="product-description">${product.description}</p>
-          <div class="price-container">
-            <p class="original-price">R$ ${product.originalPrice.toFixed(2).replace('.', ',')}</p>
-            <p class="sale-price">R$ ${product.salePrice.toFixed(2).replace('.', ',')}</p>
-          </div>
-          <button class="product-btn">Ver oferta →</button>
-        </div>
-      </div>
-    `;
-  }
+  // Criar card do produto (compartilhado via components/productCard.js)
 
   // Atualizar URL
   function updateURL() {
