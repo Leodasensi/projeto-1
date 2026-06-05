@@ -537,9 +537,52 @@ img {
 /* Products Grid */
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   animation: fadeIn 0.5s ease 0.4s both;
+}
+
+.view-all-btn {
+  display: block;
+  width: fit-content;
+  margin: 2rem auto 0;
+  padding: 0.625rem 1.5rem;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-all-btn:hover {
+  color: var(--text-primary);
+  border-color: #B5B5B5;
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.section-header .section-title {
+  margin-bottom: 0;
+}
+
+.view-all-link {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.view-all-link:hover {
+  color: var(--text-primary);
 }
 
 /* Product Card */
@@ -918,6 +961,13 @@ img {
   animation: fadeInUp 0.5s ease 0.2s both;
 }
 
+.page-header-subtitle {
+  margin-top: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  animation: fadeInUp 0.5s ease 0.3s both;
+}
+
 /* Page Content */
 .page-content {
   max-width: 800px;
@@ -1005,6 +1055,87 @@ img {
   color: #999;
 }
 
+/* FAQ Accordion */
+.faq-list {
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  animation: fadeInUp 0.5s ease 0.2s both;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--border);
+}
+
+.faq-item:last-child {
+  border-bottom: none;
+}
+
+.faq-question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg-white);
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-align: left;
+  transition: background 0.2s ease;
+}
+
+.faq-question:hover {
+  background: var(--bg-light);
+}
+
+.faq-question-text {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.faq-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.faq-item.active .faq-icon {
+  transform: rotate(45deg);
+  color: var(--primary);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.faq-answer-inner {
+  padding: 0 1.5rem 1.25rem;
+}
+
+.faq-answer p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .products-grid {
@@ -1081,10 +1212,6 @@ img {
    ============================================ */
 
 :root {
-  --orange: #FF4D00;
-  --orange-hover: #E64500;
-  --green: #10B981;
-  --yellow-bg: #FEF3C7;
 }
 
 /* Breadcrumb */
@@ -1120,7 +1247,7 @@ img {
 }
 
 .breadcrumb-current {
-  color: var(--orange);
+  color: var(--primary);
   font-weight: 500;
   max-width: 100%;
   overflow: hidden;
@@ -1220,8 +1347,8 @@ img {
 }
 
 .thumb.active {
-  border-color: var(--orange);
-  box-shadow: 0 0 0 2px rgba(255, 77, 0, 0.2);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.15);
 }
 
 /* Detalhes do produto */
@@ -1241,8 +1368,8 @@ img {
 
 /* Countdown */
 .countdown-timer {
-  background: var(--yellow-bg);
-  border: 1px solid #FDE68A;
+  background: #F5F5F5;
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1rem 1.25rem;
   display: flex;
@@ -1257,7 +1384,7 @@ img {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #92400E;
+  color: var(--text-primary);
   font-size: 0.875rem;
   font-weight: 500;
 }
@@ -1274,8 +1401,8 @@ img {
 }
 
 .countdown-box {
-  background: white;
-  border: 1px solid #FDE68A;
+  background: var(--primary);
+  border: 1px solid var(--primary);
   border-radius: 8px;
   padding: 0.4rem 0.6rem;
   display: flex;
@@ -1288,7 +1415,7 @@ img {
 .countdown-value {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--orange);
+  color: white;
   font-variant-numeric: tabular-nums;
   font-family: 'Inter', monospace;
 }
@@ -1300,7 +1427,7 @@ img {
 }
 
 .countdown-sep {
-  color: var(--orange);
+  color: var(--primary);
   font-weight: 700;
   font-size: 1.1rem;
 }
@@ -1344,13 +1471,13 @@ img {
 .product-pricing .sale-price {
   font-size: 2.25rem;
   font-weight: 800;
-  color: var(--orange);
+  color: var(--primary);
   margin: 0;
   letter-spacing: -0.02em;
 }
 
 .savings-line {
-  color: var(--green);
+  color: var(--text-secondary);
   font-size: 0.95rem;
   font-weight: 500;
   margin: 0.25rem 0 0;
@@ -1369,7 +1496,7 @@ img {
 }
 
 .product-btn-primary {
-  background: var(--orange);
+  background: var(--primary);
   color: white;
   text-align: center;
   text-decoration: none;
@@ -1380,7 +1507,7 @@ img {
 }
 
 .product-btn-primary:hover {
-  background: var(--orange-hover);
+  background: var(--primary-hover);
 }
 
 .product-btn-secondary {
@@ -1398,19 +1525,26 @@ img {
   transform: translateY(-2px);
 }
 
-.product-btn-secondary.saved {
-  background: #ECFDF5;
-  border-color: var(--green);
-  color: var(--green);
+.product-btn-secondary.copied {
+  background: #F5F5F5;
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
-.bookmark-icon {
+.product-btn-secondary.disabled,
+.product-btn-secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.coupon-icon {
   width: 18px;
   height: 18px;
 }
 
-.product-btn-secondary.saved .bookmark-icon {
-  fill: var(--green);
+.product-btn-secondary.copied .coupon-icon {
+  fill: var(--primary);
 }
 
 /* Loja */
@@ -1449,10 +1583,10 @@ img {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  color: var(--green);
+  color: var(--primary);
   font-size: 0.85rem;
   font-weight: 600;
-  background: #ECFDF5;
+  background: #F5F5F5;
   padding: 0.3rem 0.7rem;
   border-radius: 20px;
 }
@@ -1571,12 +1705,12 @@ img {
 .mobile-cta-price {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--orange);
+  color: var(--primary);
 }
 
 .mobile-cta-discount {
   font-size: 0.75rem;
-  color: var(--green);
+  color: var(--text-secondary);
   font-weight: 600;
 }
 

@@ -1,4 +1,3 @@
-// Script da página de Busca
 document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('searchInput');
   const searchBtn = document.getElementById('searchBtn');
@@ -9,19 +8,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const menuToggle = document.querySelector('.menu-toggle');
   const navLinks = document.querySelector('.nav-links');
 
-  // Parâmetros da URL
   const urlParams = new URLSearchParams(window.location.search);
   const initialQuery = urlParams.get('q') || '';
   const initialCategory = urlParams.get('category') || 'all';
 
+  let products = window.mockProducts ? window.mockProducts.slice() : [];
   let currentQuery = initialQuery;
   let currentCategory = initialCategory;
   let currentSort = 'discount';
 
-  // Inicializar input de busca
   searchInput.value = initialQuery;
 
-  // Renderizar pills de filtro
   function renderFilterPills() {
     const allCategories = ['all', ...new Set(products.map(p => p.category))];
     filterPills.innerHTML = allCategories.map(cat => `
@@ -30,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
       </button>
     `).join('');
 
-    // Event listeners
     filterPills.querySelectorAll('.filter-pill').forEach(pill => {
       pill.addEventListener('click', () => {
         currentCategory = pill.dataset.category;
@@ -41,11 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Filtrar e ordenar produtos
   function getFilteredProducts() {
     let filtered = [...products];
 
-    // Filtrar por busca
     if (currentQuery) {
       const query = currentQuery.toLowerCase();
       filtered = filtered.filter(p =>
@@ -55,12 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     }
 
-    // Filtrar por categoria
     if (currentCategory !== 'all') {
       filtered = filtered.filter(p => p.category === currentCategory);
     }
 
-    // Ordenar
     switch (currentSort) {
       case 'discount':
         filtered.sort((a, b) => b.discount - a.discount);
@@ -79,11 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
     return filtered;
   }
 
-  // Renderizar produtos
   function renderProducts() {
     const filtered = getFilteredProducts();
 
-    // Info dos resultados
     if (currentQuery) {
       resultsInfo.innerHTML = `Encontrados <strong>${filtered.length}</strong> resultados para "<strong>${currentQuery}</strong>"`;
     } else if (currentCategory !== 'all') {
@@ -92,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
       resultsInfo.innerHTML = `Mostrando todos os <strong>${filtered.length}</strong> produtos`;
     }
 
-    // Grid vazio ou com produtos
     if (filtered.length === 0) {
       productsGrid.innerHTML = `
         <div class="empty-state">
@@ -109,9 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Criar card do produto (compartilhado via components/productCard.js)
-
-  // Atualizar URL
   function updateURL() {
     const params = new URLSearchParams();
     if (currentQuery) params.set('q', currentQuery);
@@ -120,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
     history.replaceState({}, '', newURL);
   }
 
-  // Busca
   function handleSearch() {
     currentQuery = searchInput.value.trim();
     updateURL();
@@ -133,18 +118,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
   searchBtn.addEventListener('click', handleSearch);
 
-  // Ordenação
   sortSelect.addEventListener('change', () => {
     currentSort = sortSelect.value;
     renderProducts();
   });
 
-  // Menu mobile
   menuToggle.addEventListener('click', () => {
     navLinks.classList.toggle('active');
   });
 
-  // Inicializar
   renderFilterPills();
   renderProducts();
+
+  if (window.ProductsAPI) {
+    let promise;
+    if (initialQuery && typeof window.ProductsAPI.searchProducts === 'function') {
+      promise = window.ProductsAPI.searchProducts(initialQuery);
+    } else if (initialCategory !== 'all' && typeof window.ProductsAPI.getProductsByCategory === 'function') {
+      promise = window.ProductsAPI.getProductsByCategory(initialCategory);
+    } else if (typeof window.ProductsAPI.getAllProducts === 'function') {
+      promise = window.ProductsAPI.getAllProducts();
+    }
+
+    if (promise) {
+      promise.then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          products = data;
+          renderFilterPills();
+          renderProducts();
+        }
+      }).catch(err => {
+        console.warn('Falha ao atualizar do Supabase, mantendo mock:', err);
+      });
+    }
+  }
 });

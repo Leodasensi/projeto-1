@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const applyFiltersBtn = document.getElementById('applyFilters');
   let filterOpen = false;
 
+  let allProducts = window.mockProducts ? window.mockProducts.slice() : [];
   let selectedCategory = 'all';
   let selectedDiscount = '0';
   let selectedSort = 'recent';
@@ -48,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderCategories() {
     if (!categoriesGrid) return;
-    categoriesGrid.innerHTML = categories.map(cat => `
+    categoriesGrid.innerHTML = window.categories.map(cat => `
       <div class="category-card" data-category="${cat.name}">
         ${categoryIcons[cat.name] || ''}
         <span>${cat.name}</span>
@@ -64,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderProducts() {
-    let filtered = [...products];
+    let filtered = [...allProducts];
 
     if (selectedCategory !== 'all') {
       filtered = filtered.filter(p => p.category === selectedCategory);
@@ -74,16 +75,12 @@ document.addEventListener('DOMContentLoaded', () => {
       filtered = filtered.filter(p => p.discount > parseInt(selectedDiscount));
     }
 
-    switch (selectedSort) {
-      case 'discount':
-        filtered.sort((a, b) => b.discount - a.discount);
-        break;
-      case 'price-asc':
-        filtered.sort((a, b) => a.salePrice - b.salePrice);
-        break;
-      case 'recent':
-        filtered.sort((a, b) => b.id - a.id);
-        break;
+    if (selectedSort === 'discount') {
+      filtered.sort((a, b) => b.discount - a.discount);
+    } else if (selectedSort === 'price-asc') {
+      filtered.sort((a, b) => a.salePrice - b.salePrice);
+    } else {
+      filtered.sort((a, b) => b.id - a.id);
     }
 
     const featured = filtered.slice(0, 6);
@@ -122,4 +119,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderCategories();
   renderProducts();
+
+  if (window.ProductsAPI && typeof window.ProductsAPI.getAllProducts === 'function') {
+    window.ProductsAPI.getAllProducts(8).then(products => {
+      if (Array.isArray(products) && products.length > 0) {
+        allProducts = products;
+        renderProducts();
+      }
+    }).catch(err => {
+      console.warn('Falha ao atualizar produtos do Supabase, mantendo mock:', err);
+    });
+  }
 });

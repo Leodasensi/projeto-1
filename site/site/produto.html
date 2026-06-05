@@ -25,7 +25,7 @@
       <ul class="nav-links">
         <li><a href="index.html">Início</a></li>
         <li><a href="sobre.html">Sobre</a></li>
-        <li><a href="blog.html">Blog</a></li>
+        <li><a href="faq.html">FAQ</a></li>
       </ul>
     </div>
   </header>
@@ -90,11 +90,12 @@
           <a href="#" class="product-btn product-btn-primary" id="storeLink" target="_blank" rel="noopener noreferrer">
             Ver oferta na loja →
           </a>
-          <button type="button" class="product-btn product-btn-secondary" id="saveBtn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bookmark-icon">
-              <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+          <button type="button" class="product-btn product-btn-secondary" id="couponBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="coupon-icon">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+              <line x1="7" y1="7" x2="7.01" y2="7"/>
             </svg>
-            <span id="saveBtnText">Salvar promoção</span>
+            <span id="couponBtnText">Copiar cupom</span>
           </button>
         </div>
 
@@ -171,7 +172,9 @@
     </div>
   </footer>
 
-  <script src="data/products.js"></script>
+  <script src="js/mockData.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/products.js"></script>
   <script src="components/productCard.js"></script>
   <script src="components/countdown.js"></script>
   <script src="produto.js"></script>
