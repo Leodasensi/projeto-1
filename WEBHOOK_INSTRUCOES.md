@@ -7,9 +7,7 @@ Endpoint que recebe promoções de um bot externo (Python) e salva no Supabase.
 | Ambiente | URL |
 |----------|-----|
 | **Desenvolvimento local** | `http://localhost:54321/functions/v1/webhook` |
-| **Produção** | `https://SEU-PROJECT-REF.supabase.co/functions/v1/webhook` |
-
-> O `SEU-PROJECT-REF` é o ID do projeto no Supabase (Dashboard → Settings → API → Project URL).
+| **Produção** | `https://kywgmckuoueojcsomaxu.supabase.co/functions/v1/webhook` |
 
 ## Autenticação
 
@@ -47,8 +45,8 @@ Apenas `titulo` e `url_original` são obrigatórios. Os demais são opcionais.
 ```python
 import requests
 
-WEBHOOK_URL = 'http://localhost:54321/functions/v1/webhook'
-# Em produção: 'https://SEU-PROJECT-REF.supabase.co/functions/v1/webhook'
+WEBHOOK_URL = 'https://kywgmckuoueojcsomaxu.supabase.co/functions/v1/webhook'
+# Em dev local: 'http://localhost:54321/functions/v1/webhook'
 WEBHOOK_TOKEN = 'infinity_promo_secret_2026'
 
 def enviar_promocao(produto: dict):
@@ -106,7 +104,7 @@ npm install -g supabase
 
 ```bash
 supabase login
-supabase link --project-ref SEU-PROJECT-REF
+supabase link --project-ref kywgmckuoueojcsomaxu
 ```
 
 ### 3. Configurar o token como secret

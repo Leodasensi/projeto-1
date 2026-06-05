@@ -1,4 +1,4 @@
-function createProductCard(product) {
+export function createProductCard(product) {
   return `
     <div class="product-card" data-id="${product.id}">
       <div class="product-image">

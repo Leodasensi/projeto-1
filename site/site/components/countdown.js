@@ -1,4 +1,4 @@
-function renderCountdownHTML() {
+export function renderCountdownHTML() {
   return `
     <div class="countdown-timer" data-state="running">
       <div class="countdown-header">
@@ -32,7 +32,7 @@ function pad(n) {
   return n.toString().padStart(2, '0');
 }
 
-function initCountdownTimer(container, slug) {
+export function initCountdownTimer(container, slug) {
   if (!container) return;
   const key = `countdown-${slug}`;
   let endTime = parseInt(localStorage.getItem(key));

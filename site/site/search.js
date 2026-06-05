@@ -1,3 +1,7 @@
+import { supabase } from './js/supabase.js';
+import { createProductCard } from './components/productCard.js';
+import { transformProduct } from './js/transform.js';
+
 document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('searchInput');
   const searchBtn = document.getElementById('searchBtn');
@@ -12,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const initialQuery = urlParams.get('q') || '';
   const initialCategory = urlParams.get('category') || 'all';
 
-  let products = window.mockProducts ? window.mockProducts.slice() : [];
+  let products = [];
   let currentQuery = initialQuery;
   let currentCategory = initialCategory;
   let currentSort = 'discount';
@@ -44,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const query = currentQuery.toLowerCase();
       filtered = filtered.filter(p =>
         p.name.toLowerCase().includes(query) ||
-        p.description.toLowerCase().includes(query) ||
+        (p.description || '').toLowerCase().includes(query) ||
         p.category.toLowerCase().includes(query)
       );
     }
@@ -64,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         filtered.sort((a, b) => b.salePrice - a.salePrice);
         break;
       case 'recent':
-        filtered.sort((a, b) => b.id - a.id);
+        filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
         break;
     }
 
@@ -127,29 +131,43 @@ document.addEventListener('DOMContentLoaded', () => {
     navLinks.classList.toggle('active');
   });
 
-  renderFilterPills();
-  renderProducts();
+  async function loadProducts() {
+    try {
+      let query;
+      if (currentQuery) {
+        query = supabase
+          .from('products')
+          .select('*')
+          .eq('active', true)
+          .ilike('name', `%${currentQuery}%`)
+          .order('created_at', { ascending: false });
+      } else if (currentCategory !== 'all') {
+        query = supabase
+          .from('products')
+          .select('*')
+          .eq('active', true)
+          .eq('category', currentCategory)
+          .order('created_at', { ascending: false });
+      } else {
+        query = supabase
+          .from('products')
+          .select('*')
+          .eq('active', true)
+          .order('created_at', { ascending: false });
+      }
 
-  if (window.ProductsAPI) {
-    let promise;
-    if (initialQuery && typeof window.ProductsAPI.searchProducts === 'function') {
-      promise = window.ProductsAPI.searchProducts(initialQuery);
-    } else if (initialCategory !== 'all' && typeof window.ProductsAPI.getProductsByCategory === 'function') {
-      promise = window.ProductsAPI.getProductsByCategory(initialCategory);
-    } else if (typeof window.ProductsAPI.getAllProducts === 'function') {
-      promise = window.ProductsAPI.getAllProducts();
-    }
+      const { data, error } = await query;
+      if (error) throw error;
 
-    if (promise) {
-      promise.then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          products = data;
-          renderFilterPills();
-          renderProducts();
-        }
-      }).catch(err => {
-        console.warn('Falha ao atualizar do Supabase, mantendo mock:', err);
-      });
+      products = (data || []).map(transformProduct);
+      renderFilterPills();
+      renderProducts();
+    } catch (err) {
+      console.error('Erro ao buscar produtos:', err);
+      products = [];
+      renderProducts();
     }
   }
+
+  loadProducts();
 });

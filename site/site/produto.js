@@ -1,7 +1,11 @@
-document.addEventListener('DOMContentLoaded', () => {
+import { supabase } from './js/supabase.js';
+import { createProductCard } from './components/productCard.js';
+import { initCountdownTimer } from './components/countdown.js';
+import { transformProduct } from './js/transform.js';
+
+document.addEventListener('DOMContentLoaded', async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const slug = urlParams.get('slug');
-  const product = slug ? findProductBySlug(slug) : null;
 
   const menuToggle = document.querySelector('.menu-toggle');
   const navLinks = document.querySelector('.nav-links');
@@ -11,14 +15,29 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  if (!product) {
-    document.getElementById('productNotFound').style.display = 'block';
-    document.getElementById('productMain').style.display = 'none';
-    document.querySelector('.product-specs-section').style.display = 'none';
-    document.querySelector('.related-section').style.display = 'none';
-    document.getElementById('mobileCtaBar').style.display = 'none';
-    document.getElementById('breadcrumb').style.display = 'none';
-    document.title = 'Produto não encontrado — Infinity Promo';
+  if (!slug) {
+    window.location.replace('index.html');
+    return;
+  }
+
+  let product;
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('slug', slug)
+      .eq('active', true)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) {
+      window.location.replace('index.html');
+      return;
+    }
+    product = transformProduct(data);
+  } catch (err) {
+    console.error('Erro ao buscar produto:', err);
+    window.location.replace('index.html');
     return;
   }
 
@@ -29,27 +48,36 @@ document.addEventListener('DOMContentLoaded', () => {
   initCountdownTimer(document.getElementById('countdownContainer'), product.slug);
   initCouponButton(product);
   renderSpecs(product);
-  renderRelated(product);
   initMobileCta(product);
 
-  if (window.ProductsAPI) {
-    window.ProductsAPI.getProductBySlug(slug).then(fresh => {
-      if (!fresh) return;
-      Object.assign(product, fresh);
-      updateSEO(fresh);
-      renderDetails(fresh);
-      renderSpecs(fresh);
-      renderRelated(fresh);
-      initMobileCta(fresh);
-    }).catch(err => {
-      console.warn('Falha ao sincronizar produto do Supabase, mantendo mock:', err);
-    });
-  }
+  loadRelated(product);
 });
 
-function findProductBySlug(slug) {
-  const all = window.mockProducts || [];
-  return all.find(p => p.slug === slug) || null;
+async function loadRelated(product) {
+  const grid = document.getElementById('relatedGrid');
+  const section = document.querySelector('.related-section');
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('category', product.category)
+      .eq('active', true)
+      .neq('slug', product.slug)
+      .order('created_at', { ascending: false })
+      .limit(3);
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      if (section) section.style.display = 'none';
+      return;
+    }
+    const related = data.map(transformProduct);
+    grid.innerHTML = related.map(p => createProductCard(p)).join('');
+  } catch (err) {
+    console.error('Erro ao buscar produtos relacionados:', err);
+    if (section) section.style.display = 'none';
+  }
 }
 
 function updateSEO(product) {
@@ -172,7 +200,7 @@ function initCouponButton(product) {
 
 function renderSpecs(product) {
   const table = document.getElementById('specsTable');
-  const rows = Object.entries(product.specs)
+  const rows = Object.entries(product.specs || {})
     .map(([key, value]) => `
       <div class="specs-row">
         <span class="specs-label">${key}</span>
@@ -181,38 +209,6 @@ function renderSpecs(product) {
     `).join('');
   table.innerHTML = rows;
   document.getElementById('productLongDescription').textContent = product.longDescription;
-}
-
-function renderRelated(product) {
-  let related = [];
-  if (window.ProductsAPI && typeof window.ProductsAPI.getRelatedProducts === 'function') {
-    window.ProductsAPI.getRelatedProducts(product.category, product.slug, 3).then(data => {
-      if (Array.isArray(data) && data.length > 0) {
-        const grid = document.getElementById('relatedGrid');
-        if (data.length === 0) {
-          document.querySelector('.related-section').style.display = 'none';
-          return;
-        }
-        grid.innerHTML = data.map(p => createProductCard(p)).join('');
-      }
-    }).catch(err => {
-      console.warn('Falha ao buscar relacionados do Supabase:', err);
-      renderRelatedFromMock(product);
-    });
-    return;
-  }
-  renderRelatedFromMock(product);
-}
-
-function renderRelatedFromMock(product) {
-  const all = window.mockProducts || [];
-  const related = all.filter(p => p.id !== product.id && p.category === product.category).slice(0, 3);
-  const grid = document.getElementById('relatedGrid');
-  if (related.length === 0) {
-    document.querySelector('.related-section').style.display = 'none';
-    return;
-  }
-  grid.innerHTML = related.map(p => createProductCard(p)).join('');
 }
 
 function initMobileCta(product) {
