@@ -56,8 +56,8 @@ def buscar_promocoes(query: str, desconto_minimo: float = 20) -> list[dict]:
                 "titulo":        titulo_el.text.strip(),
                 "preco":         preco_atual,
                 "preco_original": preco_orig,
-                "desconto_pct":  desconto,
-                "link":          link_el["href"].split("?")[0],
+                "desconto_pct":  desconto,  
+                "link": str(link_el.get("href") or "").split("?")[0],
             })
 
         except Exception:
