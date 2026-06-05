@@ -27,11 +27,30 @@ document.addEventListener('DOMContentLoaded', () => {
   renderGallery(product);
   renderDetails(product);
   initCountdownTimer(document.getElementById('countdownContainer'), product.slug);
-  initSaveButton(product);
+  initCouponButton(product);
   renderSpecs(product);
   renderRelated(product);
   initMobileCta(product);
+
+  if (window.ProductsAPI) {
+    window.ProductsAPI.getProductBySlug(slug).then(fresh => {
+      if (!fresh) return;
+      Object.assign(product, fresh);
+      updateSEO(fresh);
+      renderDetails(fresh);
+      renderSpecs(fresh);
+      renderRelated(fresh);
+      initMobileCta(fresh);
+    }).catch(err => {
+      console.warn('Falha ao sincronizar produto do Supabase, mantendo mock:', err);
+    });
+  }
 });
+
+function findProductBySlug(slug) {
+  const all = window.mockProducts || [];
+  return all.find(p => p.slug === slug) || null;
+}
 
 function updateSEO(product) {
   document.title = `${product.name} — Infinity Promo`;
@@ -113,28 +132,41 @@ function renderDetails(product) {
   }
 }
 
-function initSaveButton(product) {
-  const btn = document.getElementById('saveBtn');
-  const text = document.getElementById('saveBtnText');
-  const key = `saved-${product.slug}`;
+function initCouponButton(product) {
+  const btn = document.getElementById('couponBtn');
+  const text = document.getElementById('couponBtnText');
 
-  function update(saved) {
-    if (saved) {
-      btn.classList.add('saved');
-      text.textContent = '✓ Salvo!';
-    } else {
-      btn.classList.remove('saved');
-      text.textContent = 'Salvar promoção';
-    }
+  if (!product.coupon) {
+    btn.disabled = true;
+    btn.classList.add('disabled');
+    text.textContent = 'Sem cupom disponível';
+    return;
   }
 
-  update(localStorage.getItem(key) === 'true');
+  let resetTimer = null;
 
-  btn.addEventListener('click', () => {
-    const isSaved = localStorage.getItem(key) === 'true';
-    const newState = !isSaved;
-    localStorage.setItem(key, newState.toString());
-    update(newState);
+  btn.addEventListener('click', async () => {
+    if (btn.classList.contains('copied')) return;
+    try {
+      await navigator.clipboard.writeText(product.coupon);
+    } catch (err) {
+      const textarea = document.createElement('textarea');
+      textarea.value = product.coupon;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'absolute';
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
+    btn.classList.add('copied');
+    text.textContent = '✓ Cupom copiado!';
+    clearTimeout(resetTimer);
+    resetTimer = setTimeout(() => {
+      btn.classList.remove('copied');
+      text.textContent = 'Copiar cupom';
+    }, 2000);
   });
 }
 
@@ -152,7 +184,29 @@ function renderSpecs(product) {
 }
 
 function renderRelated(product) {
-  const related = getRelatedProducts(product.id, product.category, 3);
+  let related = [];
+  if (window.ProductsAPI && typeof window.ProductsAPI.getRelatedProducts === 'function') {
+    window.ProductsAPI.getRelatedProducts(product.category, product.slug, 3).then(data => {
+      if (Array.isArray(data) && data.length > 0) {
+        const grid = document.getElementById('relatedGrid');
+        if (data.length === 0) {
+          document.querySelector('.related-section').style.display = 'none';
+          return;
+        }
+        grid.innerHTML = data.map(p => createProductCard(p)).join('');
+      }
+    }).catch(err => {
+      console.warn('Falha ao buscar relacionados do Supabase:', err);
+      renderRelatedFromMock(product);
+    });
+    return;
+  }
+  renderRelatedFromMock(product);
+}
+
+function renderRelatedFromMock(product) {
+  const all = window.mockProducts || [];
+  const related = all.filter(p => p.id !== product.id && p.category === product.category).slice(0, 3);
   const grid = document.getElementById('relatedGrid');
   if (related.length === 0) {
     document.querySelector('.related-section').style.display = 'none';

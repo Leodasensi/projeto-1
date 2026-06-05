@@ -1,4 +1,4 @@
-const products = [
+window.mockProducts = [
   {
     id: 1,
     slug: "galaxy-s24-ultra",
@@ -10,6 +10,9 @@ const products = [
     salePrice: 5999.00,
     discount: 29,
     imageId: "phone1",
+    store: { name: "Samsung Store", freeShipping: true },
+    link: "https://www.samsung.com.br",
+    coupon: "INFINITY-S24U",
     specs: {
       "Processador": "Snapdragon 8 Gen 3",
       "RAM": "12GB",
@@ -18,12 +21,7 @@ const products = [
       "Câmera Principal": "200MP + 50MP + 12MP + 10MP",
       "Bateria": "5000mAh",
       "Sistema": "Android 14 com One UI 6.1"
-    },
-    store: {
-      name: "Samsung Store",
-      freeShipping: true
-    },
-    link: "https://www.samsung.com.br"
+    }
   },
   {
     id: 2,
@@ -36,6 +34,9 @@ const products = [
     salePrice: 9999.00,
     discount: 23,
     imageId: "laptop1",
+    store: { name: "Apple Store", freeShipping: true },
+    link: "https://www.apple.com/br",
+    coupon: "MACBOOK-M3-15",
     specs: {
       "Processador": "Apple M3 (8-core CPU)",
       "GPU": "10-core",
@@ -44,12 +45,7 @@ const products = [
       "Tela": "15.3\" Liquid Retina",
       "Bateria": "Até 18 horas",
       "Peso": "1.51 kg"
-    },
-    store: {
-      name: "Apple Store",
-      freeShipping: true
-    },
-    link: "https://www.apple.com/br"
+    }
   },
   {
     id: 3,
@@ -62,6 +58,9 @@ const products = [
     salePrice: 549.90,
     discount: 39,
     imageId: "shoes1",
+    store: { name: "Nike Brasil", freeShipping: true },
+    link: "https://www.nike.com.br",
+    coupon: "AIRMAX270-OFF",
     specs: {
       "Material": "Mesh engineering + sintético",
       "Solado": "Borracha com amortecimento Air",
@@ -69,12 +68,7 @@ const products = [
       "Tecnologia": "Air Max visível",
       "Fechamento": "Cadarço",
       "Gênero": "Unissex"
-    },
-    store: {
-      name: "Nike Brasil",
-      freeShipping: true
-    },
-    link: "https://www.nike.com.br"
+    }
   },
   {
     id: 4,
@@ -87,6 +81,9 @@ const products = [
     salePrice: 2299.00,
     discount: 34,
     imageId: "tv1",
+    store: { name: "Samsung Store", freeShipping: true },
+    link: "https://www.samsung.com.br",
+    coupon: null,
     specs: {
       "Tamanho": "55 polegadas",
       "Resolução": "4K UHD (3840x2160)",
@@ -96,12 +93,7 @@ const products = [
       "Áudio": "20W RMS, Dolby Digital Plus",
       "Entradas": "3 HDMI, 2 USB",
       "Smart": "Tizen, Alexa integrada"
-    },
-    store: {
-      name: "Samsung Store",
-      freeShipping: true
-    },
-    link: "https://www.samsung.com.br"
+    }
   },
   {
     id: 5,
@@ -114,6 +106,9 @@ const products = [
     salePrice: 299.90,
     discount: 40,
     imageId: "airfryer1",
+    store: { name: "Mondial Store", freeShipping: false },
+    link: "https://www.mondial.com.br",
+    coupon: null,
     specs: {
       "Capacidade": "5.5 litros",
       "Potência": "1500W",
@@ -122,12 +117,7 @@ const products = [
       "Voltagem": "110V ou 220V (verificar)",
       "Material": "Plástico com cesto antiaderente",
       "Cor": "Preto"
-    },
-    store: {
-      name: "Mondial Store",
-      freeShipping: false
-    },
-    link: "https://www.mondial.com.br"
+    }
   },
   {
     id: 6,
@@ -140,6 +130,9 @@ const products = [
     salePrice: 3499.00,
     discount: 22,
     imageId: "ps5",
+    store: { name: "PlayStation Store", freeShipping: true },
+    link: "https://store.playstation.com/pt-br",
+    coupon: "PS5-100OFF",
     specs: {
       "CPU": "AMD Zen 2 8-core 3.5GHz",
       "GPU": "AMD RDNA 2 10.28 TFLOPs",
@@ -148,12 +141,7 @@ const products = [
       "Resolução": "Até 4K @ 120fps",
       "Ray Tracing": "Sim",
       "Controle": "DualSense incluso"
-    },
-    store: {
-      name: "PlayStation Store",
-      freeShipping: true
-    },
-    link: "https://store.playstation.com/pt-br"
+    }
   },
   {
     id: 7,
@@ -166,6 +154,9 @@ const products = [
     salePrice: 199.90,
     discount: 50,
     imageId: "jacket1",
+    store: { name: "Zattini", freeShipping: true },
+    link: "https://www.zattini.com.br",
+    coupon: null,
     specs: {
       "Material": "Couro sintético PU",
       "Forro": "Poliéster",
@@ -173,12 +164,7 @@ const products = [
       "Bolsos": "2 laterais com zíper",
       "Tamanhos": "P ao GG",
       "Cor": "Preto"
-    },
-    store: {
-      name: "Zattini",
-      freeShipping: true
-    },
-    link: "https://www.zattini.com.br"
+    }
   },
   {
     id: 8,
@@ -191,6 +177,9 @@ const products = [
     salePrice: 1499.00,
     discount: 40,
     imageId: "robot1",
+    store: { name: "Xiaomi Oficial", freeShipping: true },
+    link: "https://www.mi.com/br",
+    coupon: "ROBOXIAOMI-40",
     specs: {
       "Sucção": "4000Pa",
       "Bateria": "5200mAh (até 150 min)",
@@ -199,12 +188,7 @@ const products = [
       "Conectividade": "Wi-Fi, app Mi Home",
       "Compatível": "Alexa, Google Assistente",
       "Peso": "3.6 kg"
-    },
-    store: {
-      name: "Xiaomi Oficial",
-      freeShipping: true
-    },
-    link: "https://www.mi.com/br"
+    }
   },
   {
     id: 9,
@@ -217,6 +201,9 @@ const products = [
     salePrice: 399.90,
     discount: 33,
     imageId: "weights1",
+    store: { name: "Decathlon", freeShipping: false },
+    link: "https://www.decathlon.com.br",
+    coupon: null,
     specs: {
       "Material": "Aço fundido + borracha",
       "Composição": "6 pares (2, 3, 4, 5, 6 e 9kg)",
@@ -224,12 +211,7 @@ const products = [
       "Pegador": "Ergonômico antiderrapante",
       "Acessórios": "Suporte organizador",
       "Uso": "Doméstico e profissional"
-    },
-    store: {
-      name: "Decathlon",
-      freeShipping: false
-    },
-    link: "https://www.decathlon.com.br"
+    }
   },
   {
     id: 10,
@@ -242,6 +224,9 @@ const products = [
     salePrice: 2699.00,
     discount: 18,
     imageId: "switch",
+    store: { name: "Nintendo eShop", freeShipping: true },
+    link: "https://www.nintendo.com/pt-br",
+    coupon: "SWITCH-OLED18",
     specs: {
       "Tela": "7\" OLED touchscreen",
       "Resolução": "1080p (TV) / 720p (portátil)",
@@ -250,12 +235,7 @@ const products = [
       "Conectividade": "Wi-Fi, Bluetooth, LAN no dock",
       "Portas": "USB-C, HDMI, 3x USB no dock",
       "Áudio": "Estéreo"
-    },
-    store: {
-      name: "Nintendo eShop",
-      freeShipping: true
-    },
-    link: "https://www.nintendo.com/pt-br"
+    }
   },
   {
     id: 11,
@@ -268,6 +248,9 @@ const products = [
     salePrice: 29.90,
     discount: 46,
     imageId: "book1",
+    store: { name: "Amazon Brasil", freeShipping: true },
+    link: "https://www.amazon.com.br",
+    coupon: "LIVRO-HABITO",
     specs: {
       "Autor": "Charles Duhigg",
       "Editora": "Objetiva",
@@ -276,12 +259,7 @@ const products = [
       "Encadernação": "Brochura",
       "ISBN": "9788539004119",
       "Ano": "2012"
-    },
-    store: {
-      name: "Amazon Brasil",
-      freeShipping: true
-    },
-    link: "https://www.amazon.com.br"
+    }
   },
   {
     id: 12,
@@ -294,6 +272,9 @@ const products = [
     salePrice: 349.90,
     discount: 42,
     imageId: "headphone1",
+    store: { name: "JBL Brasil", freeShipping: true },
+    link: "https://www.jbl.com.br",
+    coupon: null,
     specs: {
       "Driver": "40mm",
       "Conectividade": "Bluetooth 5.3",
@@ -302,16 +283,11 @@ const products = [
       "Multipoint": "2 dispositivos simultâneos",
       "Carregamento": "USB-C, carga rápida (5min = 3h)",
       "Peso": "232g"
-    },
-    store: {
-      name: "JBL Brasil",
-      freeShipping: true
-    },
-    link: "https://www.jbl.com.br"
+    }
   }
 ];
 
-const categories = [
+window.mockCategories = [
   { name: "Eletrônicos", icon: "smartphone" },
   { name: "Moda", icon: "shirt" },
   { name: "Casa & Cozinha", icon: "home" },
@@ -319,21 +295,3 @@ const categories = [
   { name: "Livros", icon: "book-open" },
   { name: "Games", icon: "gamepad-2" }
 ];
-
-function findProductBySlug(slug) {
-  return products.find(p => p.slug === slug);
-}
-
-function findProductById(id) {
-  return products.find(p => p.id === parseInt(id));
-}
-
-function getRelatedProducts(productId, category, limit = 3) {
-  return products
-    .filter(p => p.id !== productId && p.category === category)
-    .slice(0, limit);
-}
-
-function formatPrice(price) {
-  return "R$ " + price.toFixed(2).replace('.', ',');
-}

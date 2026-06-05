@@ -25,7 +25,7 @@
       <ul class="nav-links">
         <li><a href="index.html" class="active">Início</a></li>
         <li><a href="sobre.html">Sobre</a></li>
-        <li><a href="blog.html">Blog</a></li>
+        <li><a href="faq.html">FAQ</a></li>
       </ul>
     </div>
   </header>
@@ -33,7 +33,6 @@
   <section class="hero">
     <img src="infinity.png" alt="Infinity Promo" class="hero-logo">
     <h1>Encontre as melhores promoções</h1>
-    <p>Produtos com desconto real, atualizados todos os dias</p>
     <div class="search-box">
       <div class="filter-container">
         <button class="filter-toggle" id="filterToggle" aria-label="Filtros">
@@ -119,13 +118,11 @@
     </div>
   </section>
 
-  <section class="categories-section">
-    <h2 class="section-title">Categorias</h2>
-    <div class="categories-grid" id="categoriesGrid"></div>
-  </section>
-
   <section class="section">
-    <h2 class="section-title">Destaques do dia</h2>
+    <div class="section-header">
+      <h2 class="section-title">Destaques do dia</h2>
+      <a href="busca.html" class="view-all-link">Ver todos →</a>
+    </div>
     <div class="products-grid" id="productsGrid"></div>
   </section>
 
@@ -152,7 +149,10 @@
     </div>
   </footer>
 
-  <script src="data/products.js"></script>
+  <script src="js/mockData.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/products.js"></script>
   <script src="components/productCard.js"></script>
   <script src="script.js"></script>
 </body>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sobre - Infinity Promo</title>
+  <title>FAQ - Infinity Promo</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -22,37 +22,20 @@
       </button>
       <ul class="nav-links">
         <li><a href="index.html">Início</a></li>
-        <li><a href="sobre.html" class="active">Sobre</a></li>
-        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="sobre.html">Sobre</a></li>
+        <li><a href="faq.html" class="active">FAQ</a></li>
       </ul>
     </div>
   </header>
 
   <div class="page-header">
-    <h1>Sobre o Infinity Promo</h1>
+    <h1>Perguntas frequentes</h1>
+    <p class="page-header-subtitle">Tire suas dúvidas sobre o Infinity Promo</p>
   </div>
 
-  <div class="page-content">
-    <h2>Nossa Missão</h2>
-    <p>O Infinity Promo nasceu com o objetivo de facilitar a vida de quem busca as melhores ofertas. Centralizamos promoções de diversas categorias para que você economize tempo e dinheiro.</p>
-
-    <h2>O Que Fazemos</h2>
-    <p>Selecionamos cuidadosamente as melhores promoções do mercado, verificando preços e qualidade para garantir que você tenha acesso apenas às ofertas que realmente valem a pena.</p>
-
-    <h2>Nossos Valores</h2>
-    <ul>
-      <li><strong>Transparência:</strong> Mostramos o preço real com desconto, sem letras miúdas.</li>
-      <li><strong>Qualidade:</strong> Só divulgamos produtos de lojas confiáveis.</li>
-      <li><strong>Agilidade:</strong> Promoções atualizadas diariamente.</li>
-      <li><strong>Facilidade:</strong> Interface simples para encontrar o que precisa rápido.</li>
-    </ul>
-
-    <h2>Equipe</h2>
-    <p>Somos uma pequena equipe apaixonada por tecnologia e economia. Trabalhamos para tornar o universo de promoções mais acessível para todos.</p>
-
-    <h2>Contato</h2>
-    <p>Tem alguma sugestão ou dúvida? Entre em contato conosco pelo e-mail: <strong>contato@infinitypromo.com.br</strong></p>
-  </div>
+  <section class="section">
+    <div class="faq-list" id="faqList"></div>
+  </section>
 
   <footer class="footer">
     <div class="footer-content">
@@ -67,6 +50,7 @@
         <h4>Links</h4>
         <ul>
           <li><a href="sobre.html">Sobre</a></li>
+          <li><a href="faq.html">FAQ</a></li>
           <li><a href="#">Contato</a></li>
           <li><a href="#">Política de Privacidade</a></li>
         </ul>
@@ -77,10 +61,6 @@
     </div>
   </footer>
 
-  <script>
-    document.querySelector('.menu-toggle').addEventListener('click', () => {
-      document.querySelector('.nav-links').classList.toggle('active');
-    });
-  </script>
+  <script src="faq.js"></script>
 </body>
 </html>
