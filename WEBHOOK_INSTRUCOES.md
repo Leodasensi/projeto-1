@@ -88,6 +88,33 @@ if __name__ == '__main__':
 | `405` | Método diferente de POST | `{"success": false, "error": "Method not allowed"}` |
 | `500` | Erro no Supabase (ex: slug duplicado) | `{"success": false, "error": "..."}` |
 
+## Configurar o `.env` (para o bot Python)
+
+O repositório tem um arquivo **`.env.example`** na raiz com a estrutura das variáveis:
+
+```
+SUPABASE_URL=
+SUPABASE_KEY=
+WEBHOOK_SECRET=
+```
+
+Para rodar o bot Python localmente, copie o exemplo para um arquivo `.env` na raiz e preencha com os valores reais:
+
+```bash
+cp .env.example .env
+# edite o .env e preencha as três variáveis
+```
+
+⚠️ **Nunca commite o `.env` no Git.** O `.gitignore` da raiz já ignora `.env` e `*.env`, mas confira antes de cada `git add` / `git commit`. Quem tiver acesso ao repositório conseguirá ver as chaves — incluindo a `service_role` do Supabase, que dá acesso total ao banco.
+
+| Variável | Onde é usada |
+|----------|--------------|
+| `SUPABASE_URL` | Bot Python (e também o site estático, mas lá está hardcoded em `js/supabase.js`) |
+| `SUPABASE_KEY` | Bot Python (no site estático é a `publishable` key, hardcoded em `js/supabase.js`) |
+| `WEBHOOK_SECRET` | Bot Python para autenticar no endpoint. **A mesma string precisa ser configurada no Supabase via `supabase secrets set WEBHOOK_SECRET=...`** |
+
+> Nota: a Edge Function **não** lê do `.env` do projeto — ela lê das secrets do Supabase configuradas via CLI (`supabase secrets set`).
+
 ## Deploy (uma vez só)
 
 ### 1. Instalar o Supabase CLI (se ainda não tem)

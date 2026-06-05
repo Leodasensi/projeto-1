@@ -1,0 +1,5 @@
+.env
+*.env
+promocoes.db
+pycache/
+.vscode/
