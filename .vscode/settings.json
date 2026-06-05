@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/financas/aplicativo/main/mercado-livre-bot",
+        "${workspaceFolder}/financas/aplicativo/main/shopee-bot"
+    ]
+}

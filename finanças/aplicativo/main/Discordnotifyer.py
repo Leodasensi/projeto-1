@@ -8,11 +8,12 @@ BOT_DIR = os.path.join(os.path.dirname(__file__), 'mercado-livre-bot')
 sys.path.insert(0, BOT_DIR)
 load_dotenv(os.path.join(BOT_DIR, '.env'))
 
-from botMercadoLivre import produtos, carregar_produtos_do_banco # type: ignore
-from database import init_db # type: ignore
-
+from botMercadoLivre import produtos, carregar_produtos_do_banco  # type: ignore
+from database import init_db  # type: ignore
 load_dotenv()
 WEBHOOK = os.getenv("WEBHOOK")
+if not WEBHOOK:
+    raise ValueError("WEBHOOK não definido no .env")
 
 init_db()
 
