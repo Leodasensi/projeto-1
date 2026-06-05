@@ -7,6 +7,120 @@
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="infinity.png">
   <meta name="description" content="Sobre o Infinity Promo: nossa missão é facilitar a busca pelas melhores promoções online, com ofertas verificadas e atualizadas diariamente.">
+  <style>
+    /* ===== Estilos scoped da página /sobre ===== */
+
+    .page-header-subtitle {
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
+
+    .sobre-section {
+      margin-top: 3.5rem;
+    }
+
+    .sobre-section:first-child {
+      margin-top: 1rem;
+    }
+
+    .sobre-section h2 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+
+    .sobre-section p {
+      margin-bottom: 1rem;
+    }
+
+    .sobre-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Botão de contato */
+    .sobre-contact-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin-top: 1rem;
+      padding: 0.75rem 1.25rem;
+      background: #374151;
+      color: #ffffff;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .sobre-contact-button:hover {
+      background: #1f2937;
+      transform: translateY(-1px);
+    }
+
+    .sobre-contact-button svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Responsivo (mobile) */
+    @media (max-width: 768px) {
+      /* Previne scroll horizontal acidental */
+      body {
+        overflow-x: hidden;
+      }
+
+      /* Hero */
+      .page-header {
+        padding: 1.75rem 1rem;
+      }
+      .page-header h1 {
+        font-size: 1.5rem;
+        line-height: 1.3;
+      }
+      .page-header-subtitle {
+        font-size: 0.95rem;
+        line-height: 1.55;
+        padding: 0 0.25rem;
+        word-wrap: break-word;
+      }
+
+      /* Container principal */
+      .page-content {
+        margin: 1.25rem auto;
+        padding: 0 1rem;
+      }
+
+      /* Seções */
+      .sobre-section {
+        margin-top: 2.25rem;
+      }
+      .sobre-section:first-child {
+        margin-top: 0.5rem;
+      }
+      .sobre-section h2 {
+        font-size: 1.125rem;
+        margin-bottom: 0.85rem;
+      }
+      .sobre-section p {
+        font-size: 0.95rem;
+        line-height: 1.65;
+      }
+
+      /* Botão de contato - largura total */
+      .sobre-contact-button {
+        display: flex;
+        width: 100%;
+        box-sizing: border-box;
+        justify-content: center;
+        align-items: center;
+        padding: 0.85rem 1rem;
+        font-size: 0.95rem;
+        text-align: center;
+        margin-top: 0.85rem;
+      }
+    }
+  </style>
 </head>
 <body>
   <header class="header">
@@ -32,28 +146,26 @@
 
   <div class="page-header">
     <h1>Sobre o Infinity Promo</h1>
+    <p class="page-header-subtitle">A gente não dorme enquanto tiver promoção boa por aí. Nascemos para reunir as melhores ofertas do mercado em um só lugar.</p>
   </div>
 
   <div class="page-content">
-    <h2>Nossa Missão</h2>
-    <p>O Infinity Promo nasceu com o objetivo de facilitar a vida de quem busca as melhores ofertas. Centralizamos promoções de diversas categorias para que você economize tempo e dinheiro.</p>
+    <section class="sobre-section">
+      <h2>Equipe</h2>
+      <p>Um grupo de amigos apaixonados por tecnologia e pela arte de comprar bem. A ideia surgiu de uma frustração real: passar horas procurando desconto em vários sites diferentes. Criamos o Infinity Promo para acabar com isso, e hoje fazemos isso com muito café e muito entusiasmo.</p>
+    </section>
 
-    <h2>O Que Fazemos</h2>
-    <p>Selecionamos cuidadosamente as melhores promoções do mercado, verificando preços e qualidade para garantir que você tenha acesso apenas às ofertas que realmente valem a pena.</p>
-
-    <h2>Nossos Valores</h2>
-    <ul>
-      <li><strong>Transparência:</strong> Mostramos o preço real com desconto, sem letras miúdas.</li>
-      <li><strong>Qualidade:</strong> Só divulgamos produtos de lojas confiáveis.</li>
-      <li><strong>Agilidade:</strong> Promoções atualizadas diariamente.</li>
-      <li><strong>Facilidade:</strong> Interface simples para encontrar o que precisa rápido.</li>
-    </ul>
-
-    <h2>Equipe</h2>
-    <p>Somos uma pequena equipe apaixonada por tecnologia e economia. Trabalhamos para tornar o universo de promoções mais acessível para todos.</p>
-
-    <h2>Contato</h2>
-    <p>Tem alguma sugestão ou dúvida? Entre em contato conosco pelo e-mail: <strong>contato@infinitypromo.com.br</strong></p>
+    <section class="sobre-section">
+      <h2>Contato</h2>
+      <p>Encontrou uma promoção incrível? Tem uma sugestão ou só quer bater um papo? Fala com a gente!</p>
+      <a href="mailto:infinitypromocontatos@gmail.com" class="sobre-contact-button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="m22 7-10 6L2 7"/>
+        </svg>
+        infinitypromocontatos@gmail.com
+      </a>
+    </section>
   </div>
 
   <footer class="footer">
