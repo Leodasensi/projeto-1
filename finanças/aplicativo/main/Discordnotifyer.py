@@ -4,61 +4,111 @@ import sys
 import requests
 import time
 
-BOT_DIR = os.path.join(os.path.dirname(__file__), 'mercado-livre-bot')
-sys.path.insert(0, BOT_DIR)
-load_dotenv(os.path.join(BOT_DIR, '.env'))
+sys.path.insert(0, os.path.dirname(__file__))
+from supabase_db import buscar_promocoes
 
-from botMercadoLivre import produtos, carregar_produtos_do_banco  # type: ignore
-from database import init_db  # type: ignore
 load_dotenv()
 WEBHOOK = os.getenv("WEBHOOK")
-if not WEBHOOK:
-    raise ValueError("WEBHOOK não definido no .env")
 
-init_db()
+CARGOpromoShopee = "1511789248771129514"
+CARGOpromoMercadoLivre = "1511789008231993344"
 
-if not produtos:
-    produtos = carregar_produtos_do_banco()
 
-promomercadolivre = []
-promoshopee = []
+def formatar_produto(produto):
+    titulo = produto.get("titulo", "Sem titulo")
+    preco_original = produto.get("preco_original")
+    preco_desconto = produto.get("preco_desconto")
+    desconto = produto.get("porcentagem_desconto")
+    url = produto.get("url_afiliado") or produto.get("url_original", "")
+    imagem = produto.get("imagem_url", "")
 
-CARGOpromoShopee = '1511789248771129514'
-CARGOpromoMercadoLivre = '1511789008231993344'
+    if preco_original:
+        preco_original = f"R$ {preco_original:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    else:
+        preco_original = "N/A"
 
-# MERCADO LIVRE
-payload = {
-    "content": f"Promoção encontrada!\n{promomercadolivre}\n <@&{CARGOpromoMercadoLivre}>",
-        "allowed_mentions": {
-        "roles": [1511789008231993344]
-    },
-    "username": "Bot da Infinity - MERCADO LIVRE",
-    "avatar_url": "https://i.postimg.cc/gk159hF3/Infinity.png",
-    "embeds": [{
-        "title": "------INFINITY------",
-        "description": "Detalhes da promoção aqui",
-        "color": 0x00FF00
-    }]
-}
+    if preco_desconto:
+        preco_desconto = f"R$ {preco_desconto:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    else:
+        preco_desconto = "N/A"
 
-response = requests.post(WEBHOOK, json=payload)
-print(response.status_code)
+    embed = {
+        "title": titulo[:256],
+        "url": url,
+        "color": 0x00FF00,
+        "fields": [
+            {"name": "De:", "value": preco_original, "inline": True},
+            {"name": "Por:", "value": preco_desconto, "inline": True},
+        ],
+    }
 
-# SHOPI
-payload = {
-    "content": f"Promoção encontrada!\n{promoshopee}\n <@&{CARGOpromoShopee}>",
-    "allowed_mentions": {
-        "roles": [1511789248771129514]
-    },
-    "username": "Bot da Infinity - SHOPEE",
-    "avatar_url": "https://i.postimg.cc/gk159hF3/Infinity.png",
-    "embeds": [{
-        "title": "------INFINITY------",
-        "description": "Detalhes da promoção aqui",
-        "color": 0x00FF00
-    }]
-}
+    if desconto:
+        embed["fields"].append({"name": "Desconto:", "value": f"{desconto}%", "inline": True})
 
-time.sleep(1)
-response = requests.post(WEBHOOK, json=payload)
-print(response.status_code)
+    if imagem:
+        embed["thumbnail"] = {"url": imagem}
+
+    return embed
+
+
+def enviar_discord(webhook_url, embeds, cargo_id, username, content_msg):
+    if not embeds:
+        return
+
+    payload = {
+        "content": content_msg,
+        "username": username,
+        "avatar_url": "https://i.postimg.cc/gk159hF3/Infinity.png",
+        "allowed_mentions": {"roles": [int(cargo_id)]},
+        "embeds": embeds[:10],
+    }
+
+    response = requests.post(webhook_url, json=payload)
+    print(f"{username}: {response.status_code}")
+    return response
+
+
+def main():
+    load_dotenv()
+    webhook = os.getenv("WEBHOOK")
+
+    if not webhook:
+        print("WEBHOOK nao configurado no .env")
+        return
+
+    print("Buscando promocoes no Supabase...")
+    promocoes = buscar_promocoes(10)
+
+    if not promocoes:
+        print("Nenhuma promocao encontrada")
+        return
+
+    print(f"Encontradas {len(promocoes)} promocoes")
+
+    embeds_ml = [formatar_produto(p) for p in promocoes if p.get("loja") == "mercadolivre"]
+    embeds_shopee = [formatar_produto(p) for p in promocoes if p.get("loja") == "shopee"]
+
+    if embeds_ml:
+        enviar_discord(
+            webhook,
+            embeds_ml,
+            CARGOpromoMercadoLivre,
+            "Bot da Infinity - MERCADO LIVRE",
+            f"Promocoes do Mercado Livre! <@&{CARGOpromoMercadoLivre}>",
+        )
+
+    if embeds_shopee:
+        time.sleep(1)
+        enviar_discord(
+            webhook,
+            embeds_shopee,
+            CARGOpromoShopee,
+            "Bot da Infinity - SHOPEE",
+            f"Promocoes da Shopee! <@&{CARGOpromoShopee}>",
+        )
+
+    print("Concluido!")
+
+
+if __name__ == "__main__":
+    main()
