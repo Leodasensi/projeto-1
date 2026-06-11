@@ -4,7 +4,7 @@ import sys
 from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(__file__))
-from supabase_db import inserir_promocoes, buscar_promocoes
+from supabase_db import inserir_promocoes, buscar_promocoes, client
 
 
 def buscar_no_sqlite(db_path, limite=100):
@@ -32,8 +32,6 @@ def buscar_no_sqlite(db_path, limite=100):
 
 
 def ja_existe_no_supabase(titulo, url_original):
-    from supabase_db import client
-
     try:
         result = (
             client.table("promocoes")

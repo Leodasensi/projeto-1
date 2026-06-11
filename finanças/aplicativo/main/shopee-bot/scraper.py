@@ -1,48 +1,134 @@
 import time
 import random
 import json
+import os
+import pickle
 from datetime import datetime
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
+from pathlib import Path
+import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
-from webdriver_manager.chrome import ChromeDriverManager
-from bs4 import BeautifulSoup
 
 from config import (
     URL_BASE, MAX_PAGES, REQUEST_DELAY, VERBOSE,
     USER_AGENTS, get_affiliate_url, CATEGORIAS, DOMAIN
 )
 
+COOKIES_FILE = Path(__file__).parent / "cookies.pkl"
+SHOPEE_EMAIL = os.getenv("SHOPEE_EMAIL", "")
+SHOPEE_PASSWORD = os.getenv("SHOPEE_PASSWORD", "")
+
 
 def criar_driver():
-    chrome_options = Options()
-    chrome_options.add_argument("--headless=new")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--window-size=1920,1080")
-    chrome_options.add_argument(f"user-agent={random.choice(USER_AGENTS)}")
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    chrome_options.add_experimental_option("useAutomationExtension", False)
+    options = uc.ChromeOptions()
+    # options.add_argument("--headless=new")  # Desabilitado para testar
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1920,1080")
+    options.add_argument(f"user-agent={random.choice(USER_AGENTS)}")
+    options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-
-    driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-        "source": """
-            Object.defineProperty(navigator, 'webdriver', {
-                get: () => undefined
-            })
-        """
-    })
-
+    driver = uc.Chrome(options=options, version_main=None)
     return driver
+
+
+def salvar_cookies(driver):
+    cookies = driver.get_cookies()
+    pickle.dump(cookies, open(COOKIES_FILE, "wb"))
+    log(f"Cookies salvos ({len(cookies)} cookies)")
+
+
+def carregar_cookies(driver):
+    if COOKIES_FILE.exists():
+        try:
+            driver.get(URL_BASE)
+            time.sleep(2)
+            cookies = pickle.load(open(COOKIES_FILE, "rb"))
+            for cookie in cookies:
+                try:
+                    driver.add_cookie(cookie)
+                except:
+                    pass
+            log(f"Cookies carregados ({len(cookies)} cookies)")
+            return True
+        except Exception as e:
+            log(f"Erro ao carregar cookies: {e}")
+            return False
+    return False
+
+
+def login_shopee(driver):
+    if not SHOPEE_EMAIL or not SHOPEE_PASSWORD:
+        log("Credenciais SHOPEE_EMAIL/SHOPEE_PASSWORD nao configuradas")
+        return False
+
+    # Tentar cookies primeiro
+    if carregar_cookies(driver):
+        driver.get(URL_BASE)
+        time.sleep(3)
+        # Verificar se esta logado
+        page_source = driver.page_source.lower()
+        if "login" not in driver.current_url.lower() and "entrar" not in page_source[:1000]:
+            log("Login via cookies OK")
+            return True
+        log("Cookies expirados, fazendo login novamente")
+
+    log("Fazendo login na Shopee...")
+    driver.get(f"{URL_BASE}/buyer/login")
+    time.sleep(5)
+
+    try:
+        # Selecionar idioma Portugues
+        try:
+            lang_btn = WebDriverWait(driver, 5).until(
+                lambda d: d.find_element(By.XPATH, "//button[contains(text(), 'Portugu')]")
+            )
+            lang_btn.click()
+            log("Idioma selecionado")
+            time.sleep(2)
+        except:
+            pass
+
+        # Aceitar cookies se aparecer
+        try:
+            cookie_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Aceitar')]")
+            cookie_btn.click()
+            time.sleep(1)
+        except:
+            pass
+
+        email_input = WebDriverWait(driver, 10).until(
+            lambda d: d.find_element(By.CSS_SELECTOR, "input[name='loginKey']")
+        )
+        email_input.clear()
+        email_input.send_keys(SHOPEE_EMAIL)
+        time.sleep(1)
+
+        pass_input = driver.find_element(By.CSS_SELECTOR, "input[name='password']")
+        pass_input.clear()
+        pass_input.send_keys(SHOPEE_PASSWORD)
+        time.sleep(1)
+
+        # Botao ENTRAR via JS
+        login_btn = WebDriverWait(driver, 5).until(
+            lambda d: d.find_element(By.CSS_SELECTOR, "button.b5aVaf.PVSuiZ.Gqupku")
+        )
+        driver.execute_script("arguments[0].click();", login_btn)
+        time.sleep(6)
+
+        if "login" not in driver.current_url.lower():
+            log("Login realizado com sucesso")
+            salvar_cookies(driver)
+            return True
+        else:
+            log("Falha no login - verifique credenciais")
+            return False
+
+    except Exception as e:
+        log(f"Erro durante login: {e}")
+        return False
 
 
 def log(mensagem):
@@ -53,226 +139,172 @@ def log(mensagem):
 
 def scroll_pagina(driver, vezes=5):
     for i in range(vezes):
-        driver.execute_script(f"window.scrollBy(0, 800);")
-        time.sleep(1)
+        driver.execute_script("window.scrollBy(0, 800);")
+        time.sleep(1.5)
 
 
-def extrair_produtos_pagina(driver):
+def extrair_produtos_via_js(driver):
+    """Extrai dados dos produtos via JavaScript executado no browser"""
+    try:
+        produtos = driver.execute_script("""
+            var produtos = [];
+
+            // Tentar pegar de diferentes seletores
+            var cards = document.querySelectorAll(
+                '.shopee-search-item-result__item, ' +
+                '[data-sqe="item"], ' +
+                '.col-xs-2-4, ' +
+                'a[data-sqe="link"]'
+            );
+
+            cards.forEach(function(card) {
+                try {
+                    var titulo = '';
+                    var link = '';
+                    var precoOriginal = null;
+                    var precoDesconto = null;
+                    var imagem = '';
+                    var vendidos = '';
+
+                    // Titulo
+                    var tituloEl = card.querySelector(
+                        '[data-sqe="name"], ' +
+                        '.shopee-search-item-result__item-name, ' +
+                        'div._24kIg, ' +
+                        'div._1s31Jj, ' +
+                        'div.ie3A\\+n, ' +
+                        'div.line-clamp-2'
+                    );
+                    if (tituloEl) titulo = tituloEl.innerText.trim();
+
+                    // Link
+                    var linkEl = card.querySelector('a[href*="/product/"], a[href*="-i."]');
+                    if (!linkEl) linkEl = card.closest('a') || card.querySelector('a');
+                    if (linkEl) link = linkEl.href || linkEl.getAttribute('href') || '';
+
+                    // Imagem
+                    var imgEl = card.querySelector('img');
+                    if (imgEl) imagem = imgEl.src || imgEl.dataset.src || '';
+
+                    // Precos - pegar todos os spans com valores
+                    var priceEls = card.querySelectorAll('span');
+                    var precos = [];
+                    priceEls.forEach(function(el) {
+                        var texto = el.innerText.trim();
+                        if (texto.match(/R\\$/) || texto.match(/\\d+[,.]\\d+/)) {
+                            var valor = texto.replace('R$', '').replace('.', '').replace(',', '.').trim();
+                            valor = parseFloat(valor);
+                            if (valor > 0 && valor < 100000) precos.push(valor);
+                        }
+                    });
+
+                    if (precos.length >= 2) {
+                        precoOriginal = Math.max.apply(null, precos);
+                        precoDesconto = Math.min.apply(null, precos);
+                    } else if (precos.length === 1) {
+                        precoDesconto = precos[0];
+                    }
+
+                    // Vendidos
+                    var soldEl = card.querySelector(
+                        '.shopee-search-item-result__item-sold, ' +
+                        'div._245-SC, ' +
+                        'span[class*="sold"]'
+                    );
+                    if (soldEl) vendidos = soldEl.innerText.trim();
+
+                    if (titulo && link) {
+                        produtos.push({
+                            titulo: titulo,
+                            url: link,
+                            precoOriginal: precoOriginal,
+                            precoDesconto: precoDesconto,
+                            imagem: imagem,
+                            vendidos: vendidos
+                        });
+                    }
+                } catch(e) {}
+            });
+
+            return produtos;
+        """)
+        return produtos or []
+    except Exception as e:
+        log(f"Erro ao extrair via JS: {e}")
+        return []
+
+
+def extrair_produtos_api_log(driver):
+    """Tenta extrair dados dos logs de performance (API responses)"""
     produtos = []
+    try:
+        logs = driver.get_log("performance")
+        for entry in logs:
+            try:
+                msg = json.loads(entry["message"])["message"]
+                if msg["method"] == "Network.responseReceived":
+                    url = msg["params"]["response"]["url"]
+                    if "/api/v4/search/search_items" in url or "/api/v4/recommend" in url:
+                        request_id = msg["params"]["requestId"]
+                        try:
+                            body = driver.execute_cdp_cmd(
+                                "Network.getResponseBody", {"requestId": request_id}
+                            )
+                            data = json.loads(body["body"])
+                            items = data.get("items", [])
+                            for item in items:
+                                item_data = item.get("item_basic", item)
+                                if not item_data.get("name"):
+                                    continue
 
-    time.sleep(3)
+                                preco_original = (item_data.get("price_max", 0) or item_data.get("price", 0))
+                                preco_desconto = (item_data.get("price", 0) or item_data.get("price_min", 0))
+                                if preco_original > 100000: preco_original /= 100000
+                                if preco_desconto > 100000: preco_desconto /= 100000
 
-    scroll_pagina(driver, 6)
+                                imagem = item_data.get("image", "")
+                                if imagem and not imagem.startswith("http"):
+                                    imagem = f"https://down-br.img.susercontent.com/file/{imagem}"
 
-    soup = BeautifulSoup(driver.page_source, "lxml")
+                                shop_id = item_data.get("shopid", "")
+                                item_id = item_data.get("itemid", "")
+                                url_produto = f"https://shopee.com.br/product/{shop_id}/{item_id}"
 
-    seletores_produtos = [
-        "div.shopee-search-item-result__item",
-        "div.col-xs-2-4",
-        "div[data-sqe='item']",
-        "a[data-sqe='link']",
-    ]
+                                desconto = None
+                                if preco_original > preco_desconto > 0:
+                                    desconto = round(((preco_original - preco_desconto) / preco_original) * 100, 1)
 
-    itens = []
-    for seletor in seletores_produtos:
-        itens = soup.select(seletor)
-        if itens:
-            break
+                                rating = item_data.get("item_rating", {})
+                                stars = rating.get("rating_star") if isinstance(rating, dict) else None
 
-    if not itens:
-        itens = soup.find_all("div", class_=lambda x: x and "item" in x.lower())
-
-    log(f"Encontrados {len(itens)} itens na pagina")
-
-    for item in itens:
-        try:
-            produto = extrair_dados_produto(item)
-            if produto and produto.get("titulo"):
-                produtos.append(produto)
-        except Exception as e:
-            if VERBOSE:
-                log(f"Erro ao extrair produto: {e}")
-            continue
-
+                                produtos.append({
+                                    "produto_id": str(item_id),
+                                    "titulo": item_data.get("name", ""),
+                                    "url_original": url_produto,
+                                    "url_afiliado": get_affiliate_url(url_produto),
+                                    "preco_original": round(preco_original, 2) if preco_original else None,
+                                    "preco_desconto": round(preco_desconto, 2) if preco_desconto else None,
+                                    "porcentagem_desconto": desconto,
+                                    "imagem_url": imagem,
+                                    "especificacoes": "",
+                                    "categoria": detectar_categoria(item_data.get("name", "")),
+                                    "vendedor": "",
+                                    "avaliacoes": stars,
+                                    "vendidos": item_data.get("historical_sold") or item_data.get("sold"),
+                                    "localizacao": "",
+                                    "data_coleta": datetime.now().isoformat(),
+                                })
+                        except Exception:
+                            pass
+            except Exception:
+                continue
+    except Exception:
+        pass
     return produtos
-
-
-def extrair_dados_produto(item):
-    produto = {}
-
-    titulo_elem = (
-        item.select_one("div[data-sqe='name']") or
-        item.select_one("div.shopee-search-item-result__item-name") or
-        item.select_one("div._1NoI8_") or
-        item.select_one("a div div") or
-        item.find("div", class_=lambda x: x and "name" in x.lower() if x else False)
-    )
-    if titulo_elem:
-        produto["titulo"] = titulo_elem.get_text(strip=True)
-
-    link_elem = (
-        item.select_one("a[data-sqe='link']") or
-        item.select_one("a.shopee-search-item-result__item") or
-        item.find("a", href=True)
-    )
-    if link_elem:
-        url = link_elem.get("href", "")
-        if url.startswith("/"):
-            url = f"https://{DOMAIN}{url}"
-        produto["url_original"] = url
-        produto["url_afiliado"] = get_affiliate_url(url)
-
-    produto_id = None
-    if "/i." in produto.get("url_original", ""):
-        try:
-            parts = produto["url_original"].split("/i.")
-            if len(parts) > 1:
-                produto_id = parts[1].split(".")[0]
-        except Exception:
-            pass
-    produto["produto_id"] = produto_id or ""
-
-    preco_original = None
-    preco_desconto = None
-
-    price_elems = item.select("span")
-    precos = []
-    for p in price_elems:
-        texto = p.get_text(strip=True)
-        if "R$" in texto or texto.replace(".", "").replace(",", "").isdigit():
-            valor = parse_preco(texto)
-            if valor and valor > 0:
-                precos.append(valor)
-
-    if len(precos) >= 2:
-        preco_original = max(precos)
-        preco_desconto = min(precos)
-    elif len(precos) == 1:
-        preco_desconto = precos[0]
-
-    price_current = (
-        item.select_one("span._1w9jLI") or
-        item.select_one("span.price") or
-        item.select_one("div._245-SC")
-    )
-    if price_current:
-        valor = parse_preco(price_current.get_text(strip=True))
-        if valor:
-            preco_desconto = valor
-
-    price_original = (
-        item.select_one("span._1w9jLI._1DGuEV") or
-        item.select_one("span.original-price") or
-        item.select_one("del")
-    )
-    if price_original:
-        valor = parse_preco(price_original.get_text(strip=True))
-        if valor:
-            preco_original = valor
-
-    if preco_original and preco_desconto and preco_original > preco_desconto:
-        desconto = ((preco_original - preco_desconto) / preco_original) * 100
-        produto["porcentagem_desconto"] = round(desconto, 1)
-    else:
-        produto["porcentagem_desconto"] = None
-
-    produto["preco_original"] = preco_original
-    produto["preco_desconto"] = preco_desconto
-
-    img_elem = (
-        item.select_one("img") or
-        item.select_one("div.image-placeholder")
-    )
-    if img_elem:
-        produto["imagem_url"] = img_elem.get("src") or img_elem.get("data-src", "")
-
-    sold_elem = (
-        item.select_one("div._245-SC") or
-        item.select_one("span.sold") or
-        item.find("div", string=lambda x: x and "vendido" in x.lower() if x else False)
-    )
-    if sold_elem:
-        texto = sold_elem.get_text(strip=True)
-        produto["vendidos"] = parse_vendidos(texto)
-    else:
-        produto["vendidos"] = None
-
-    rating_elem = (
-        item.select_one("div.shopee-rating-stars") or
-        item.select_one("div.rating")
-    )
-    if rating_elem:
-        stars = rating_elem.select("div.shopee-rating-stars__lit")
-        produto["avaliacoes"] = len(stars) if stars else None
-    else:
-        produto["avaliacoes"] = None
-
-    produto["especificacoes"] = extrair_especificacoes(item)
-
-    produto["categoria"] = detectar_categoria(produto.get("titulo", ""))
-
-    produto["vendedor"] = ""
-    produto["localizacao"] = ""
-
-    produto["data_coleta"] = datetime.now().isoformat()
-
-    return produto
-
-
-def parse_preco(texto):
-    if not texto:
-        return None
-
-    texto = texto.replace("R$", "").replace(" ", "").strip()
-    texto = texto.replace(".", "").replace(",", ".")
-
-    texto = "".join(c for c in texto if c.isdigit() or c == ".")
-
-    try:
-        valor = float(texto)
-        return valor if valor > 0 else None
-    except ValueError:
-        return None
-
-
-def parse_vendidos(texto):
-    if not texto:
-        return None
-
-    texto = texto.lower().strip()
-    texto = texto.replace("vendidos", "").replace("vendido", "").strip()
-
-    if "k" in texto:
-        texto = texto.replace("k", "").strip()
-        try:
-            return int(float(texto) * 1000)
-        except ValueError:
-            return None
-
-    try:
-        return int(texto)
-    except ValueError:
-        return None
-
-
-def extrair_especificacoes(item):
-    specs = []
-
-    spec_elems = item.select("div.shopee-search-item-result__item-characteristics")
-    if not spec_elems:
-        spec_elems = item.select("div._245-SC")
-
-    for spec in spec_elems:
-        texto = spec.get_text(strip=True)
-        if texto and "vendido" not in texto.lower():
-            specs.append(texto)
-
-    return " | ".join(specs) if specs else ""
 
 
 def detectar_categoria(titulo):
     titulo_lower = titulo.lower()
-
     categorias_map = {
         "celular": ["celular", "smartphone", "iphone", "samsung galaxy", "motorola", "xiaomi", "redmi"],
         "computador": ["notebook", "computador", "pc", "desktop", "macbook", "chromebook", "mac"],
@@ -288,12 +320,10 @@ def detectar_categoria(titulo):
         "ferramentas": ["furadeira", "parafusadeira", "serra", "ferramenta", "multimetro"],
         "moda": ["camisa", "calca", "vestido", "tenis", "sapato", "bolsa", "relogio"],
     }
-
     for categoria, palavras in categorias_map.items():
         for palavra in palavras:
             if palavra in titulo_lower:
                 return categoria
-
     return "geral"
 
 
@@ -302,37 +332,109 @@ def scraping_pagina(driver, url, max_paginas=None):
         max_paginas = MAX_PAGES
 
     todos_produtos = []
-
     log(f"Acessando: {url}")
 
     try:
         driver.get(url)
-        time.sleep(REQUEST_DELAY)
+        time.sleep(6)
 
-        try:
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "div.shopee-search-item-result__item, div.col-xs-2-4, div[data-sqe='item']"))
-            )
-        except TimeoutException:
-            log("Timeout aguardando produtos carregarem")
+        WebDriverWait(driver, 15).until(
+            lambda d: d.execute_script("return document.readyState") == "complete"
+        )
+        time.sleep(3)
 
-        for pagina in range(1, max_paginas + 1):
-            log(f"Scraping pagina {pagina}/{max_paginas}")
+        scroll_pagina(driver, 8)
+        time.sleep(3)
 
-            produtos = extrair_produtos_pagina(driver)
-            todos_produtos.extend(produtos)
+        # Metodo 1: Extrair via JS do DOM
+        produtos_js = extrair_produtos_via_js(driver)
+        log(f"Via DOM: {len(produtos_js)} produtos")
 
-            if pagina < max_paginas:
-                try:
-                    next_btn = driver.find_element(
-                        By.CSS_SELECTOR,
-                        "button.shopee-icon-button--right, a.btn-next"
-                    )
-                    driver.execute_script("arguments[0].click();", next_btn)
-                    time.sleep(REQUEST_DELAY)
-                except NoSuchElementException:
-                    log("Nao ha mais paginas")
-                    break
+        for p in produtos_js:
+            preco_orig = p.get("precoOriginal")
+            preco_desc = p.get("precoDesconto")
+            desconto = None
+            if preco_orig and preco_desc and preco_orig > preco_desc > 0:
+                desconto = round(((preco_orig - preco_desc) / preco_orig) * 100, 1)
+
+            vendidos_num = None
+            sold_text = p.get("vendidos", "")
+            if sold_text:
+                sold_text = sold_text.lower().replace("vendidos", "").replace("vendido", "").strip()
+                if "k" in sold_text:
+                    try: vendidos_num = int(float(sold_text.replace("k", "")) * 1000)
+                    except: pass
+                else:
+                    try: vendidos_num = int(sold_text)
+                    except: pass
+
+            url_produto = p.get("url", "")
+            if url_produto and not url_produto.startswith("http"):
+                url_produto = f"https://{DOMAIN}{url_produto}"
+
+            todos_produtos.append({
+                "produto_id": "",
+                "titulo": p.get("titulo", ""),
+                "url_original": url_produto,
+                "url_afiliado": get_affiliate_url(url_produto),
+                "preco_original": preco_orig,
+                "preco_desconto": preco_desc,
+                "porcentagem_desconto": desconto,
+                "imagem_url": p.get("imagem", ""),
+                "especificacoes": "",
+                "categoria": detectar_categoria(p.get("titulo", "")),
+                "vendedor": "",
+                "avaliacoes": None,
+                "vendidos": vendidos_num,
+                "localizacao": "",
+                "data_coleta": datetime.now().isoformat(),
+            })
+
+        # Metodo 2: Extrair via logs de API
+        produtos_api = extrair_produtos_api_log(driver)
+        log(f"Via API: {len(produtos_api)} produtos")
+        todos_produtos.extend(produtos_api)
+
+        for pagina in range(1, max_paginas):
+            log(f"Scraping pagina {pagina + 1}/{max_paginas}")
+            try:
+                next_btn = driver.find_element(
+                    By.CSS_SELECTOR,
+                    "button.shopee-icon-button--right, [class*='next-page']"
+                )
+                driver.execute_script("arguments[0].click();", next_btn)
+                time.sleep(4)
+                scroll_pagina(driver, 5)
+                time.sleep(2)
+
+                produtos_js = extrair_produtos_via_js(driver)
+                log(f"Via DOM: {len(produtos_js)} produtos")
+                for p in produtos_js:
+                    preco_orig = p.get("precoOriginal")
+                    preco_desc = p.get("precoDesconto")
+                    desconto = None
+                    if preco_orig and preco_desc and preco_orig > preco_desc > 0:
+                        desconto = round(((preco_orig - preco_desc) / preco_orig) * 100, 1)
+                    url_produto = p.get("url", "")
+                    if url_produto and not url_produto.startswith("http"):
+                        url_produto = f"https://{DOMAIN}{url_produto}"
+                    todos_produtos.append({
+                        "produto_id": "", "titulo": p.get("titulo", ""),
+                        "url_original": url_produto, "url_afiliado": get_affiliate_url(url_produto),
+                        "preco_original": preco_orig, "preco_desconto": preco_desc,
+                        "porcentagem_desconto": desconto, "imagem_url": p.get("imagem", ""),
+                        "especificacoes": "", "categoria": detectar_categoria(p.get("titulo", "")),
+                        "vendedor": "", "avaliacoes": None, "vendidos": None,
+                        "localizacao": "", "data_coleta": datetime.now().isoformat(),
+                    })
+
+                produtos_api = extrair_produtos_api_log(driver)
+                log(f"Via API: {len(produtos_api)} produtos")
+                todos_produtos.extend(produtos_api)
+
+            except NoSuchElementException:
+                log("Nao ha mais paginas")
+                break
 
     except Exception as e:
         log(f"Erro ao acessar pagina: {e}")
@@ -353,11 +455,9 @@ def scraping_flash_sale(driver):
 def scraping_categoria(driver, categoria_nome, categoria_url, max_paginas=None):
     log(f"Scraping categoria: {categoria_nome}")
     produtos = scraping_pagina(driver, categoria_url, max_paginas)
-
     for p in produtos:
         if not p.get("categoria") or p["categoria"] == "geral":
             p["categoria"] = categoria_nome
-
     return produtos
 
 
@@ -368,32 +468,25 @@ def scraping_completo(categorias_selecionadas=None):
     try:
         log("Iniciando scraping completo da Shopee...")
 
-        try:
+        if not login_shopee(driver):
+            log("Nao foi possivel fazer login. Continuando sem login...")
             driver.get(URL_BASE)
-            time.sleep(3)
-            log("Site da Shopee acessado com sucesso")
-        except Exception as e:
-            log(f"Aviso ao acessar site: {e}")
+            time.sleep(5)
 
-        produtos_ofertas = scraping_ofertas_do_dia(driver)
-        todos_produtos.extend(produtos_ofertas)
-        log(f"Ofertas do dia: {len(produtos_ofertas)} produtos")
-
-        produtos_flash = scraping_flash_sale(driver)
-        todos_produtos.extend(produtos_flash)
-        log(f"Flash Sale: {len(produtos_flash)} produtos")
-
+        # Focar em buscas que tem produtos
+        categorias_busca = [
+            "tecnologia", "celulares", "notebooks", "fones", 
+            "smartwatch", "eletrodomesticos", "beleza", "games"
+        ]
+        
         if categorias_selecionadas:
-            for nome_cat, url_cat in CATEGORIAS.items():
-                if nome_cat in categorias_selecionadas and nome_cat not in ["ofertas-do-dia", "flash-sale"]:
-                    produtos_cat = scraping_categoria(driver, nome_cat, url_cat)
-                    todos_produtos.extend(produtos_cat)
-                    log(f"Categoria {nome_cat}: {len(produtos_cat)} produtos")
-        else:
-            categorias_padrao = ["tecnologia", "celulares", "beleza"]
-            for nome_cat in categorias_padrao:
-                if nome_cat in CATEGORIAS:
-                    produtos_cat = scraping_categoria(driver, nome_cat, CATEGORIAS[nome_cat])
+            categorias_busca = [c for c in categorias_selecionadas if c in CATEGORIAS]
+        
+        for nome_cat in categorias_busca:
+            if nome_cat in CATEGORIAS:
+                url_cat = CATEGORIAS[nome_cat]
+                if "/search?" in url_cat:
+                    produtos_cat = scraping_categoria(driver, nome_cat, url_cat, max_paginas=1)
                     todos_produtos.extend(produtos_cat)
                     log(f"Categoria {nome_cat}: {len(produtos_cat)} produtos")
 
@@ -402,24 +495,15 @@ def scraping_completo(categorias_selecionadas=None):
 
     produtos_unicos = remover_duplicatas(todos_produtos)
     log(f"Total final: {len(produtos_unicos)} produtos unicos")
-
     return produtos_unicos
 
 
 def remover_duplicatas(produtos):
-    ids_vistos = set()
     urls_vistas = set()
     produtos_unicos = []
-
     for produto in produtos:
-        produto_id = produto.get("produto_id", "")
         url = produto.get("url_original", "")
-
-        chave = produto_id or url
-
-        if chave and chave not in ids_vistos and url not in urls_vistas:
-            ids_vistos.add(chave)
+        if url and url not in urls_vistas:
             urls_vistas.add(url)
             produtos_unicos.append(produto)
-
     return produtos_unicos
