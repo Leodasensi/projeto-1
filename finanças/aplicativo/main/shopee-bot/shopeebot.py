@@ -3,6 +3,7 @@ import time
 import signal
 import sys
 import os
+import json
 import requests
 import sqlite3
 from datetime import datetime, timedelta
@@ -26,6 +27,32 @@ WEBHOOK = os.getenv("WEBHOOK")
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 CARGO_SHOPEE = "1511789248771129514"
+
+ENVIADOS_FILE = os.path.join(os.path.dirname(__file__), "enviados.json")
+
+
+def carregar_enviados():
+    if os.path.exists(ENVIADOS_FILE):
+        with open(ENVIADOS_FILE, "r") as f:
+            return json.load(f)
+    return []
+
+
+def salvar_enviados(enviados):
+    with open(ENVIADOS_FILE, "w") as f:
+        json.dump(enviados[-500:], f)
+
+
+def filtrar_novos(produtos):
+    enviados = carregar_enviados()
+    novos = []
+    for p in produtos:
+        url = p.get("url_original", "")
+        if url and url not in enviados:
+            novos.append(p)
+            enviados.append(url)
+    salvar_enviados(enviados)
+    return novos
 
 
 CATEGORIA_EMOJI = {
@@ -111,7 +138,7 @@ def formatar_produto(produto):
         embed["fields"] = fields
 
     embed["footer"] = {
-        "text": f"{'🔥 OFERTA QUENTE' if desconto and desconto >= 40 else '✨ Promoção Disponível'}",
+        "text": f"{'🔥 OFERTA QUENTE 🔥' if desconto and desconto >= 40 else '✨ Promoção Disponível ✨'}",
         "icon_url": "https://img.icons8.com/fluency/48/fire-element.png",
     }
 
@@ -132,7 +159,7 @@ def enviar_discord(embeds):
         enviados = i + len(batch)
 
         payload = {
-            "content": f"🔥 **{enviados}/{total} Promoções da Shopee!** <@&{CARGO_SHOPEE}>",
+            "content": f"NOVAS PROMOÇÕES DE HOJE!\n**{enviados}/{total} Promoções da Shopee!** \n<@&{CARGO_SHOPEE}>",
             "username": "Infinity Promo",
             "avatar_url": "https://i.postimg.cc/gk159hF3/Infinity.png",
             "allowed_mentions": {"roles": [int(CARGO_SHOPEE)]},
@@ -195,12 +222,12 @@ def enviar_telegram(produtos):
 
         msg += f"\n🔗 [Ver oferta]({url})"
 
-        if imagem and i < 5:
+        if imagem:
             send_photo(api_url, TELEGRAM_CHAT_ID, imagem, msg)
         else:
             send_message(api_url, TELEGRAM_CHAT_ID, msg)
 
-        time.sleep(1)
+        time.sleep(2)
 
     console.print(f"[green]✓[/] Telegram: {min(len(produtos), 20)} produtos enviados")
 
@@ -259,7 +286,16 @@ def sincronizar_supabase(produtos):
         return 0
 
 
+def reload_env():
+    global WEBHOOK, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID
+    load_dotenv(os.path.join(os.path.dirname(__file__), ".env"), override=True)
+    WEBHOOK = os.getenv("WEBHOOK")
+    TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+    TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+
 def executar_scraping():
+    reload_env()
     console.clear()
     exibir_cabecalho()
 
@@ -289,7 +325,10 @@ def executar_scraping():
             embeds = [formatar_produto(p) for p in produtos[:10]]
             enviar_discord(embeds)
 
-            enviar_telegram(produtos)
+            produtos_novos = filtrar_novos(produtos)
+            console.print(f"[dim]Produtos novos: {len(produtos_novos)} (de {len(produtos)} coletados)[/]")
+
+            enviar_telegram(produtos_novos)
 
             sincronizar_supabase(produtos)
         else:
