@@ -5,7 +5,11 @@ import os
 import pickle
 from datetime import datetime
 from pathlib import Path
+from dotenv import load_dotenv
 import undetected_chromedriver as uc
+
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
@@ -20,6 +24,17 @@ SHOPEE_EMAIL = os.getenv("SHOPEE_EMAIL", "")
 SHOPEE_PASSWORD = os.getenv("SHOPEE_PASSWORD", "")
 
 
+def detectar_versao_chrome():
+    try:
+        import winreg
+        k = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Google\Chrome\BLBeacon")
+        versao, _ = winreg.QueryValueEx(k, "version")
+        return int(versao.split(".")[0])
+    except Exception:
+        pass
+    return None
+
+
 def criar_driver():
     options = uc.ChromeOptions()
     # options.add_argument("--headless=new")  # Desabilitado para testar
@@ -30,7 +45,9 @@ def criar_driver():
     options.add_argument(f"user-agent={random.choice(USER_AGENTS)}")
     options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
-    driver = uc.Chrome(options=options, version_main=None)
+    versao = detectar_versao_chrome()
+    log(f"Chrome detectado: versao {versao}")
+    driver = uc.Chrome(options=options, version_main=versao)
     return driver
 
 

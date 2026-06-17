@@ -10,6 +10,84 @@ assert url and key, "SUPABASE_URL e SUPABASE_KEY devem estar configurados no .en
 client = create_client(url, key)
 
 
+def init_products_table():
+    sql = """
+    CREATE TABLE IF NOT EXISTS products (
+        id BIGSERIAL PRIMARY KEY,
+        slug TEXT,
+        name TEXT NOT NULL,
+        description TEXT,
+        category TEXT,
+        original_price NUMERIC,
+        sale_price NUMERIC,
+        discount NUMERIC,
+        image_id TEXT,
+        store_name TEXT,
+        free_shipping BOOLEAN,
+        link TEXT,
+        coupon TEXT,
+        specs JSONB,
+        active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
+    CREATE INDEX IF NOT EXISTS idx_products_active ON products(active);
+    CREATE INDEX IF NOT EXISTS idx_products_created ON products(created_at);
+    """
+
+    try:
+        result = client.rpc("exec_sql", {"query": sql}).execute()
+        print("Tabela products criada com sucesso!")
+        return True
+    except Exception as e:
+        print(f"Erro ao criar tabela via RPC: {e}")
+        return False
+
+
+def inserir_produtos(dados_produtos):
+    if not dados_produtos:
+        print("Nenhum produto para inserir")
+        return 0
+
+    try:
+        result = client.table("products").insert(dados_produtos).execute()
+        print(f"Inseridos {len(result.data)} produtos no Supabase")
+        return len(result.data)
+    except Exception as e:
+        print(f"Erro ao inserir: {e}")
+        return 0
+
+
+def buscar_produtos(limite=50, apenas_ativos=True):
+    try:
+        query = client.table("products").select("*").order("created_at", desc=True).limit(limite)
+        if apenas_ativos:
+            query = query.eq("active", True)
+        result = query.execute()
+        return result.data
+    except Exception as e:
+        print(f"Erro ao buscar: {e}")
+        return []
+
+
+def buscar_produtos_por_categoria(categoria, limite=50):
+    try:
+        result = (
+            client.table("products")
+            .select("*")
+            .eq("active", True)
+            .eq("category", categoria)
+            .order("created_at", desc=True)
+            .limit(limite)
+            .execute()
+        )
+        return result.data
+    except Exception as e:
+        print(f"Erro ao buscar: {e}")
+        return []
+
+
 def criar_tabela_promocoes():
     sql = """
     CREATE TABLE IF NOT EXISTS promocoes (

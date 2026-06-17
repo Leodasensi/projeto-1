@@ -1,5 +1,8 @@
 import httpx
 import time
+import sys
+import io
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 from bs4 import BeautifulSoup
 
 HEADERS = {

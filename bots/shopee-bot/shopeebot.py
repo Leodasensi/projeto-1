@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "supabase"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "supabase"))
 from supabase_db import inserir_promocoes as inserir_supabase #type: ignore
 
 from config import UPDATE_INTERVAL, SHOPEE_AFFILIATE_ID, DB_NAME

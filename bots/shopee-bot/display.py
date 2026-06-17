@@ -1,3 +1,5 @@
+import os
+import sys
 from datetime import datetime
 from rich.console import Console
 from rich.table import Table
@@ -5,6 +7,7 @@ from rich.panel import Panel
 from rich.text import Text
 from rich import box
 
+sys.path.insert(0, os.path.dirname(__file__))
 from database import (
     buscar_todas_promocoes, buscar_por_categoria,
     contar_por_categoria, obter_estatisticas

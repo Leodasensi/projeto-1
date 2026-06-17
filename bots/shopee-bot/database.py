@@ -1,5 +1,9 @@
 import sqlite3
+import os
+import sys
 from datetime import datetime
+
+sys.path.insert(0, os.path.dirname(__file__))
 from config import DB_NAME
 
 
